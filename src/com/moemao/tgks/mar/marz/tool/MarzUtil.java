@@ -91,9 +91,9 @@ public class MarzUtil
         {
             for (MarzItemEvt marzItem : marzItemList)
             {
-                if (item.getItemId().equals(marzItem.getItemId()))
+                if (item.getItemId().equals(marzItem.getItemId()) && MarzConstant.MARZITEM_STATUS_1.equals(marzItem.getStatus()))
                 {
-                    sb.append(marzItem.getName() + "：" + item.getNum() + "，");
+                    sb.append("[" + marzItem.getName() + "：" + item.getNum() + "] ");
                 }
                 
             }

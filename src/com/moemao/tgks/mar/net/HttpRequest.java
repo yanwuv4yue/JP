@@ -8,7 +8,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Semaphore;
 
 public class HttpRequest
@@ -16,6 +15,8 @@ public class HttpRequest
     private static int SLEEP_TIME = 4000;
     
     private static final Semaphore semp = new Semaphore(1);
+    
+    private boolean bDebug = false;
     
     /**
      * 向指定URL发送GET方法的请求
@@ -26,6 +27,11 @@ public class HttpRequest
      */
     public String sendGet(String url, String param)
     {
+        if (bDebug)
+        {
+            System.out.println(param);
+        }
+        
         String result = "";
         BufferedReader in = null;
         try
@@ -48,7 +54,7 @@ public class HttpRequest
                 System.out.println(key + "--->" + map.get(key));
             }
             // 定义 BufferedReader输入流来读取URL的响应
-            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
             String line;
             while ((line = in.readLine()) != null)
             {
@@ -78,7 +84,7 @@ public class HttpRequest
         try
         {
             byte[] bytes = result.getBytes();
-            result = new String(bytes, "UTF-8");
+            result = new String(bytes);
         }
         catch (Exception e)
         {
@@ -97,6 +103,11 @@ public class HttpRequest
      */
     public String sendPost(String url, String param) throws Exception
     {
+        if (bDebug)
+        {
+            System.out.println(param);
+        }
+        
         PrintWriter out = null;
         BufferedReader in = null;
         String result = "";
@@ -187,21 +198,11 @@ public class HttpRequest
             result = result.replace("�?]", "\"]");
         }
         
+        if (bDebug)
+        {
+            System.out.println(result);
+        }
+        
         return result;
-    }
-    
-    public static void main(String[] args)
-    {        
-        try
-        {
-            String url = "https://app.login.kairisei-ma.jp:443/Auth/login.php";
-            String paramStr = "{\"uuid\":\"" + UUID.randomUUID().toString() + "\",\"clver\":\"1\",\"os\":0,\"carrier\":3,\"market\":1,\"lang\":0,\"device\":\"iPhone5S\",\"token\":\"\"}";
-            String sr = new HttpRequest().sendPost(url, paramStr);
-            System.out.println(sr);
-        }
-        catch (Exception e)
-        {
-            System.out.println(e);
-        }
     }
 }

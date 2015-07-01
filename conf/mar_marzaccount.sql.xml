@@ -101,7 +101,7 @@
                        tgksid = #{tgksId},
                        uuid = #{uuid},
                        hashtoken = #{hashToken},
-                       accountKey = #{accountKey},
+                       accountkey = #{accountKey},
                        gachahash = #{gachaHash},
                        type = #{type},
                        status = #{status},

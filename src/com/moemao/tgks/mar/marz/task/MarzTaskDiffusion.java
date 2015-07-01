@@ -575,6 +575,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             
                             if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
                             {
+                                this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水够买成功！");
                                 sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
                             }
                             else
@@ -605,6 +606,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 
                 if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
                 {
+                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水使用成功！");
+                    
                     sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
                     
                     JSONObject user = map.get(MarzConstant.JSON_TAG_ITEMUSE);
@@ -901,6 +904,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 	// 循环遍历Map中每个List，每次遍历完一个List就合成一次
                 	for (String key : fameFusionMap.keySet())
                 	{
+                	    baseFameCard = null;
                 		fameFusionIdList.clear();
     					fameFusionCardList.clear();
                 		
@@ -924,10 +928,20 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             			{
             				if (krsmaCard.getEvoCardId().equals(card.getCardid()))
             				{
-            					if (card.getFame() < 100)
-                				{
-            						baseFameCard = card;
-                				}
+            				    if (60 == card.getLv_max())
+            				    {
+            				        if (card.getFame() < 100)
+                                    {
+                                        baseFameCard = card;
+                                    }
+            				    }
+            				    else if (50 == card.getLv_max())
+                                {
+                                    if (card.getFame() < 90)
+                                    {
+                                        baseFameCard = card;
+                                    }
+                                }
             				}
             			}
                 		
@@ -936,10 +950,20 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 			if (null == baseFameCard)
                 			{
                 				// 如果没有找到进化过的卡，则拿第一张作为基础卡，基础卡只需要校验声望是否已经满了
-                				if (card.getFame() < 90)
-                				{
-                					baseFameCard = card;
-                				}
+                			    if (50 == card.getLv_max())
+                                {
+                    			    if (card.getFame() < 90)
+                    				{
+                    					baseFameCard = card;
+                    				}
+                                }
+                			    else if (40 == card.getLv_max())
+                                {
+                                    if (card.getFame() < 70)
+                                    {
+                                        baseFameCard = card;
+                                    }
+                                }
                 			}
                 			else
                 			{
@@ -981,6 +1005,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 {
                     // 只自动喂 蓝狗 红狗 粉狗
                     String[] chiari = {"20000001", "20000002", "20000003"};
+                    // 都喂光了 再上MR
+                    String chiariMr = "20000004";
                     CardEvt baseCard = null;
 
                     chiariFusionIdList.clear();
@@ -1039,6 +1065,28 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         if (null != baseCard && chiariFusionIdList.size() == 4)
                         {
                             break;
+                        }
+                    }
+                    
+                    if (null != baseCard && chiariFusionIdList.size() == 0)
+                    {
+                        for (CardEvt card : cardList)
+                        {
+                            // 如果只剩下MR狗粮 那一次喂2张
+                            if (!cardSellIdList.contains(card.getUniqid()) 
+                                    && chiariMr.equals(card.getCardid())
+                                    && !chiariFusionIdList.contains(card.getUniqid())
+                                    && chiariFusionIdList.size() < 2
+                                    && 0 == card.getIs_lock())
+                            {
+                                chiariFusionIdList.add(card.getUniqid());
+                                chiariFusionCardList.add(card);
+                            }
+                            
+                            if (null != baseCard && chiariFusionIdList.size() == 2)
+                            {
+                                break;
+                            }
                         }
                     }
                     
@@ -1815,11 +1863,11 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             case MarzConstant.VALIDATE_SETTING_FAMEFUSION: // 自动名声合成开关
                 return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getFameFusion());
             case MarzConstant.VALIDATE_SETTING_COINGACHA: // 抽硬币
-                return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getFameFusion());
+                return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getCoinGacha());
             case MarzConstant.VALIDATE_SETTING_AUTOUSEBPPOTION: // 自动喝药
-                return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getFameFusion());
+                return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getAutoUseBPPotion());
             case MarzConstant.VALIDATE_SETTING_AUTOBUYBPPOTION: // 自动买药
-                return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getFameFusion());
+                return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getAutoBuyBPPotion());
             case MarzConstant.VALIDATE_SETTING_CARDSELL_EVO: // 出售进化素材
                 return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getCardSellEvo());
             default:
