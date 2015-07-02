@@ -154,7 +154,7 @@ private String remark;
 @Override
 public String toString()
 {
-return String.format("id:%S\ntgksId:%S\niosUuid:%S\nandroidUuid:%S\niosKey:%S\nandroidKey:%S\ntype:%S\nstatus:%S\nsessionId:%S\nvip:%S\nname:%S\nuserId:%S\nlv:%S\nap:%S\napMax:%S\nbp:%S\nbpMax:%S\ncardNum:%S\ncardMax:%S\ngold:%S\nfp:%S\ncoin:%S\n", id, tgksId, uuid, hashToken, accountKey, gachaHash, type, status, sessionId, vip, name, userId, lv, ap, apMax, bp, bpMax, cardNum, cardMax, gold, fp, coin);
+return String.format("id:%S\ntgksId:%S\nuuid:%S\nhashToken:%S\naccountKey:%S\ngachaHash:%S\ntype:%S\nstatus:%S\nsessionId:%S\nvip:%S\nname:%S\nuserId:%S\nlv:%S\nap:%S\napMax:%S\nbp:%S\nbpMax:%S\ncardNum:%S\ncardMax:%S\ngold:%S\nfp:%S\ncoin:%S\n", id, tgksId, uuid, hashToken, accountKey, gachaHash, type, status, sessionId, vip, name, userId, lv, ap, apMax, bp, bpMax, cardNum, cardMax, gold, fp, coin);
 }
 
 /**

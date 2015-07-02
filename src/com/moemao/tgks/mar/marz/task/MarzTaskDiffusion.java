@@ -543,131 +543,129 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 
                 // 开始自动嗑药逻辑处理
                 // 嗑药需要保证开关打开 BP小于阀值
-                if (!validateSetting(MarzConstant.VALIDATE_SETTING_AUTOUSEBPPOTION) || account.getBp() >= Integer.parseInt(marzSettingEvt.getAutoUseBPPotionBPLimit()))
+                if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOUSEBPPOTION) || account.getBp() < Integer.parseInt(marzSettingEvt.getAutoUseBPPotionBPLimit()))
                 {
-                    return MarzConstant.SUCCESS;
-                }
-                
-                // 查看当前药水数量
-                int bpNum = 0;
-                for (ItemEvt item : itemList)
-                {
-                    if (item.getItemId().equals(marzSettingEvt.getAutoUseBPPotionItemId()))
+                    // 查看当前药水数量
+                    int bpNum = 0;
+                    for (ItemEvt item : itemList)
                     {
-                        bpNum = item.getNum();
-                        break;
-                    }
-                }
-                
-                // 如果药水已经用完 看是否开启了自动买药
-                if (0 == bpNum)
-                {
-                	// 仅当开启了买药并且设定自动可ID为1000的大药时才会自动买药
-                    if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOBUYBPPOTION)
-                    		&& MarConstant.ITEM_ID_BP_RECOVER_FULL.equals(marzSettingEvt.getAutoUseBPPotionItemId()))
-                    {
-                        // 如果石头足够
-                        if (account.getCoin() >= 5)
+                        if (item.getItemId().equals(marzSettingEvt.getAutoUseBPPotionItemId()))
                         {
-                            map = request.itemShopBuy(sid, marzSettingEvt.getAutoUseBPPotionItemId());
-                            
-                            resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                            
-                            if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                            bpNum = item.getNum();
+                            break;
+                        }
+                    }
+                    
+                    // 如果药水已经用完 看是否开启了自动买药
+                    if (0 == bpNum)
+                    {
+                        // 仅当开启了买药并且设定自动可ID为1000的大药时才会自动买药
+                        if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOBUYBPPOTION)
+                                && MarConstant.ITEM_ID_BP_RECOVER_FULL.equals(marzSettingEvt.getAutoUseBPPotionItemId()))
+                        {
+                            // 如果石头足够
+                            if (account.getCoin() >= 5)
                             {
-                                this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水够买成功！");
-                                sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                                map = request.itemShopBuy(sid, marzSettingEvt.getAutoUseBPPotionItemId());
+                                
+                                resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                                
+                                if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                                {
+                                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水够买成功！");
+                                    sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                                }
+                                else
+                                {
+                                    // 购买失败
+                                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水够买失败！");
+                                }
                             }
                             else
                             {
-                                // 购买失败
-                                this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水够买失败！");
-                                return MarzConstant.SUCCESS;
+                                if (MarConstant.ITEM_ID_BP_RECOVER_FULL.equals(marzSettingEvt.getAutoUseBPPotionItemId()) || MarConstant.ITEM_ID_BP_RECOVER_HALF.equals(marzSettingEvt.getAutoUseBPPotionItemId()))
+                                {
+                                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水已经用完，且水晶不够买药！");
+                                }
                             }
                         }
                         else
                         {
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水已经用完，且水晶不够买药！");
-                            return MarzConstant.SUCCESS;
+                            // 药水已经用完 并且没有开买药 记录日志直接跳出
+                            if (MarConstant.ITEM_ID_BP_RECOVER_FULL.equals(marzSettingEvt.getAutoUseBPPotionItemId()) || MarConstant.ITEM_ID_BP_RECOVER_HALF.equals(marzSettingEvt.getAutoUseBPPotionItemId()))
+                            {
+                                this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水已经用完，且未开启自动买药！");
+                            }
                         }
                     }
-                    else
+                    
+                    // 有药水了可以直接嗑药
+                    map = request.itemUse(sid, marzSettingEvt.getAutoUseBPPotionItemId());
+                    
+                    resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                    
+                    if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
                     {
-                        // 药水已经用完 并且没有开买药 记录日志直接跳出
-                        this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水已经用完，且未开启自动买药！");
-                        return MarzConstant.SUCCESS;
+                        this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水使用成功！");
+                        
+                        sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                        
+                        JSONObject user = map.get(MarzConstant.JSON_TAG_ITEMUSE);
+                        account.setBp(user.getJSONObject("user").getInt("bp"));
+                        this.saveAccount(account);
                     }
-                }
-                
-                // 有药水了可以直接嗑药
-                map = request.itemUse(sid, marzSettingEvt.getAutoUseBPPotionItemId());
-                
-                resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                
-                if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-                {
-                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水使用成功！");
-                    
-                    sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                    
-                    JSONObject user = map.get(MarzConstant.JSON_TAG_ITEMUSE);
-                    account.setBp(user.getJSONObject("user").getInt("bp"));
-                    this.saveAccount(account);
                 }
             }
             
             // 下面开始自动抽硬币
-            if (!validateSetting(MarzConstant.VALIDATE_SETTING_COINGACHA) || CommonUtil.isEmpty(account.getGachaHash()) || itemList.size() == 0)
+            if (validateSetting(MarzConstant.VALIDATE_SETTING_COINGACHA) && !CommonUtil.isEmpty(account.getGachaHash()) && itemList.size() > 0
+                    && account.getCardNum() < account.getCardMax())
             {
-                return MarzConstant.SUCCESS;
-            }
-            
-            // 抽奖名称=硬币ID=消耗数量=gachaId=payType
-            String gachaInfo[] = marzSettingEvt.getCoinGachaGachaId().split(MarConstant.KRSMA_SPLIT);
-            String gachaName = gachaInfo[0];
-            String itemId = gachaInfo[1];
-            int costNum = Integer.parseInt(gachaInfo[2]);
-            String gachaId = gachaInfo[3];
-            String payType = gachaInfo[4];
-            
-            ItemEvt coin = null;
-            
-            for (ItemEvt item : itemList)
-            {
-                if (itemId.equals(item.getItemId()))
+                // 抽奖名称=硬币ID=消耗数量=gachaId=payType
+                String gachaInfo[] = marzSettingEvt.getCoinGachaGachaId().split(MarConstant.KRSMA_SPLIT);
+                String gachaName = gachaInfo[0];
+                String itemId = gachaInfo[1];
+                int costNum = Integer.parseInt(gachaInfo[2]);
+                String gachaId = gachaInfo[3];
+                String payType = gachaInfo[4];
+                
+                ItemEvt coin = null;
+                
+                for (ItemEvt item : itemList)
                 {
-                    coin = item;
-                    break;
-                }
-            }
-            
-            // 如果没有硬币信息或者硬币数量不足 直接退出
-            if (null == coin || coin.getNum() < costNum)
-            {
-                return MarzConstant.SUCCESS;
-            }
-            
-            map = request.gachaPlay(itemId, gachaId, payType, account.getGachaHash());
-            
-            resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-            
-            if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-            {
-                sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                
-                JSONObject gachaPlay = map.get(MarzConstant.JSON_TAG_GACHAPLAY);
-                JSONArray cards = gachaPlay.getJSONArray("cards");
-                JSONObject cardJSON;
-                
-                List<CardEvt> gachaCardList = new ArrayList<CardEvt>();
-                
-                for (int i = 0, size = cards.size(); i < size; i++)
-                {
-                    cardJSON = JSONObject.fromObject(cards.get(i));
-                    gachaCardList.add(new CardTagEvt(cardJSON));
+                    if (itemId.equals(item.getItemId()))
+                    {
+                        coin = item;
+                        break;
+                    }
                 }
                 
-                this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_7, "自动抽卡 " + gachaName + " " + MarzUtil.getFaceImageUrlByList(gachaCardList));
+                // 如果没有硬币信息或者硬币数量不足 直接退出
+                if (null != coin && coin.getNum() >= costNum)
+                {
+                    map = request.gachaPlay(sid, gachaId, payType, account.getGachaHash());
+                    
+                    resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                    
+                    if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                    {
+                        sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                        
+                        JSONObject gachaPlay = map.get(MarzConstant.JSON_TAG_GACHAPLAY);
+                        JSONArray cards = gachaPlay.getJSONArray("cards");
+                        JSONObject cardJSON;
+                        
+                        List<CardEvt> gachaCardList = new ArrayList<CardEvt>();
+                        
+                        for (int i = 0, size = cards.size(); i < size; i++)
+                        {
+                            cardJSON = JSONObject.fromObject(cards.get(i));
+                            gachaCardList.add(new CardTagEvt(cardJSON));
+                        }
+                        
+                        this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_7, "自动抽卡 " + gachaName + " " + MarzUtil.getFaceImageUrlByList(gachaCardList));
+                    }
+                }
             }
         }
         catch (Exception e)
@@ -981,6 +979,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 			}
                 		}
                 		
+                		// 满足合成条件
                 		if (null != baseFameCard && fameFusionIdList.size() > 0)
                 		{
                 			// 调用合成接口
@@ -1624,8 +1623,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             map = request.teamBattleSoloEnd(sid, battleEndParam);
                             
                             resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                            
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_1, "战斗结束" + MarzUtil.resultCodeStr(resultCode) + " 目标副本 " + mapEvt.getBossName());
+                            List<String> newCardIdList = new ArrayList<String>();
                             
                             if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
                             {
@@ -1635,11 +1633,20 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                 
                                 this.jsonUser(account, user);
                                 this.saveAccount(account);
+                                
+                                JSONArray new_cards = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOEND).getJSONArray("new_cards");
+                                for (int i = 0; i < new_cards.size(); i++)
+                                {
+                                    newCardIdList.add(new_cards.getJSONObject(i).getString("cardid"));
+                                }
                             }
+                            
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_1, "战斗结束" + MarzUtil.resultCodeStr(resultCode) + " 目标副本 " + mapEvt.getBossName() + " 战斗获得 " + MarzUtil.getFaceImageUrlByIdList(newCardIdList));
                         }
                     }
                     while (MarzConstant.RES_CODE_SUCCESS_0 == resultCode && account.getBp() >= mapEvt.getBpCost()
-                    		&&  MarzConstant.MARZMAP_STATE_2.equals(mapEvt.getState())); // 练级模式以及拿石模式下 第一次打的图不重复刷
+                            && !marzSettingEvt.getBattleNowasteBossId().equals(mapEvt.getBossId()) // 如果这个图是不浪费BP刷的图 则只刷一次 
+                    		&& MarzConstant.MARZMAP_STATE_2.equals(mapEvt.getState())); // 练级模式以及拿石模式下 第一次打的图不重复刷
                 }
                 else
                 {

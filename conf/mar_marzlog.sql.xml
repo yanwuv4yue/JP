@@ -21,8 +21,11 @@
             <if test="info !=null and info !='' ">
                 AND t.INFO = #{info}
             </if>
-            <if test="createTime !=null and createTime !='' ">
-                AND t.CREATETIME = #{createTime}
+            <if test="createTimeStart !=null and createTimeStart !='' ">
+                AND t.CREATETIME >= #{createTimeStart}
+            </if>
+            <if test="createTimeEnd !=null and createTimeEnd !='' ">
+                AND #{createTimeEnd} >= t.CREATETIME
             </if>
         </where>
         <if test="sortSql !=null and sortSql !='' ">

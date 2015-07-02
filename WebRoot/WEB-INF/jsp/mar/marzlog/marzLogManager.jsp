@@ -13,8 +13,26 @@
 		<table>
 			<tr>
 				<td><label>账户ID: </label></td><td><input type="text" name="marzLogReq.tgksId" /></td>
+                <td>操作时间：</td>
+                <td><input type="text" class="datepicker" name="marzLogReq.createTimeStart" /></td>
+                <td>~</td>
+                <td><input type="text" class="datepicker" name="marzLogReq.createTimeEnd" /></td>
+                <td><label>类型: </label></td>
+                <td>
+                    <select name="marzLogReq.type">
+                        <option value="">全部</option>
+                        <option value="0">系统</option>
+                        <option value="1">战斗</option>
+                        <option value="2">探索</option>
+                        <option value="3">道具</option>
+                        <option value="4">合成</option>
+                        <option value="5">出售</option>
+                        <option value="6">PVP</option>
+                        <option value="7">抽卡</option>
+                        <option value="9">充值</option>
+                    </select>
+                </td>
 				<td>
-				
 				</td>
 				<td>
 				<button id="clearMarzLog">重置</button>
@@ -303,4 +321,11 @@ $(document).ready(function(){
 		return true;
 	}
 });
+
+function nofind()
+{
+    var img=event.srcElement;
+    img.src="../resources/mar/marweb/face/default.png";
+    img.onerror=null;
+}
 </script>

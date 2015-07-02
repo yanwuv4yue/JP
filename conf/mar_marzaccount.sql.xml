@@ -90,8 +90,8 @@
 
 <insert id="mar_addMarzAccount" parameterType="MarzAccountEvt">
         <![CDATA[  
-            INSERT INTO t_tgks_mar_marzaccount (id, tgksid, uuid, hashtoken, accountKey, gachahash, type, status, sessionid, vip, name, userid, lv, ap, apmax, bp, bpmax, cardnum, cardmax, gold, fp, coin, bossids, sellCardIds, fameCardIds, itemInfo, createtime, endtime, remark) 
-            VALUES (#{id}, #{tgksId}, #{uuid}, #{hashToken}, #{accountKey}, #{gachaHash}, #{type}, #{status}, #{sessionId}, #{vip}, #{name}, #{userId}, #{lv}, #{ap}, #{apMax}, #{bp}, #{bpMax}, #{cardNum}, #{cardMax}, #{gold}, #{fp}, #{coin}, #{bossIds}, #${sellCardIds}, #{fameCardIds}, #{itemInfo}, #{createTime}, #{endTime}, #{remark}) 
+            INSERT INTO t_tgks_mar_marzaccount (id, tgksid, uuid, hashToken, accountKey, gachaHash, type, status, sessionid, vip, name, userid, lv, ap, apmax, bp, bpmax, cardnum, cardmax, gold, fp, coin, bossids, sellCardIds, fameCardIds, itemInfo, createtime, endtime, remark) 
+            VALUES (#{id}, #{tgksId}, #{uuid}, #{hashToken}, #{accountKey}, #{gachaHash}, #{type}, #{status}, #{sessionId}, #{vip}, #{name}, #{userId}, #{lv}, #{ap}, #{apMax}, #{bp}, #{bpMax}, #{cardNum}, #{cardMax}, #{gold}, #{fp}, #{coin}, #{bossIds}, #{sellCardIds}, #{fameCardIds}, #{itemInfo}, #{createTime}, #{endTime}, #{remark}) 
         ]]>
 </insert>
 
