@@ -547,6 +547,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 {
                     // 查看当前药水数量
                     int bpNum = 0;
+                    boolean itemUseFlag = true;
                     for (ItemEvt item : itemList)
                     {
                         if (item.getItemId().equals(marzSettingEvt.getAutoUseBPPotionItemId()))
@@ -559,6 +560,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     // 如果药水已经用完 看是否开启了自动买药
                     if (0 == bpNum)
                     {
+                        itemUseFlag = false;
+                        
                         // 仅当开启了买药并且设定自动可ID为1000的大药时才会自动买药
                         if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOBUYBPPOTION)
                                 && MarConstant.ITEM_ID_BP_RECOVER_FULL.equals(marzSettingEvt.getAutoUseBPPotionItemId()))
@@ -574,6 +577,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                 {
                                     this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水够买成功！");
                                     sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                                    itemUseFlag = true;
                                 }
                                 else
                                 {
@@ -599,20 +603,23 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         }
                     }
                     
-                    // 有药水了可以直接嗑药
-                    map = request.itemUse(sid, marzSettingEvt.getAutoUseBPPotionItemId());
-                    
-                    resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                    
-                    if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                    if (itemUseFlag)
                     {
-                        this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水使用成功！");
+                        // 有药水了可以直接嗑药
+                        map = request.itemUse(sid, marzSettingEvt.getAutoUseBPPotionItemId());
                         
-                        sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                         
-                        JSONObject user = map.get(MarzConstant.JSON_TAG_ITEMUSE);
-                        account.setBp(user.getJSONObject("user").getInt("bp"));
-                        this.saveAccount(account);
+                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                        {
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水使用成功！");
+                            
+                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                            
+                            JSONObject user = map.get(MarzConstant.JSON_TAG_ITEMUSE);
+                            account.setBp(user.getJSONObject("user").getInt("bp"));
+                            this.saveAccount(account);
+                        }
                     }
                 }
             }
