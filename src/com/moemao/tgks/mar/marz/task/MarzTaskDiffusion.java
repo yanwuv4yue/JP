@@ -1645,7 +1645,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         }
                     }
                     while (MarzConstant.RES_CODE_SUCCESS_0 == resultCode && account.getBp() >= mapEvt.getBpCost()
-                            && !marzSettingEvt.getBattleNowasteBossId().equals(mapEvt.getBossId()) // 如果这个图是不浪费BP刷的图 则只刷一次 
+                            && !marzSettingEvt.getBattleNowasteBossId().equals(mapEvt.getBossId()) // 如果这个图是不浪费BP刷的图 则只刷一次
+                            && !"0".equals(marzSettingEvt.getBattleNowasteBossId()) // 如果选择7合1也要过滤
                     		&& MarzConstant.MARZMAP_STATE_2.equals(mapEvt.getState())); // 练级模式以及拿石模式下 第一次打的图不重复刷
                 }
                 else
