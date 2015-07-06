@@ -14,6 +14,17 @@
             <tr>
                 <td><label>ID: </label></td><td><input type="text" name="krsmaCardReq.cardId" /></td>
                 <td><label>名称: </label></td><td><input type="text" name="krsmaCardReq.name" /></td>
+                <td><label>职业: </label></td>
+                <td>
+                    <select name="krsmaCardReq.type">
+                        <option value="">全部</option>
+                        <option value="1">佣兵</option>
+		                <option value="2">富豪</option>
+		                <option value="3">盗贼</option>
+		                <option value="4">歌姬</option>
+		                <option value="5">妖精</option>
+                    </select>
+                </td>
                 <td><label>稀有度: </label></td>
                 <td>
                     <select name="krsmaCardReq.rarity">
@@ -23,6 +34,8 @@
                         <option value="SR">SR</option>
                     </select>
                 </td>
+            </tr>
+            <tr>
                 <td><label>自动出售: </label></td>
                 <td>
                     <select name="krsmaCardReq.sellFlag">
@@ -39,6 +52,7 @@
                         <option value="1">是</option>
                     </select>
                 </td>
+                <td></td><td></td>
                 <td>
                 </td>
                 <td>

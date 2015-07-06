@@ -20,7 +20,7 @@ public List<KrsmaCardEvt> queryKrsmaCard(KrsmaCardReq krsmaCardReq)
 {
 if (CommonUtil.isEmpty(krsmaCardReq.getSortSql()))
 {
-krsmaCardReq.setSortSql(" t.ID DESC");
+krsmaCardReq.setSortSql(" t.CARDID DESC");
 }
 return mar_krsmaCardDao.mar_queryKrsmaCard(krsmaCardReq);
 }
