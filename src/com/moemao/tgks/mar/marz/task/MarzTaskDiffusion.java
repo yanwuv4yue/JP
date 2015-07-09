@@ -84,6 +84,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     
     public boolean running = true;
     
+    boolean itemUseFlag = true;
+    
     public MarzTaskDiffusion(MarzAccountEvt marzAccountEvt)
     {
         // 初始化一些参数
@@ -543,11 +545,11 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 
                 // 开始自动嗑药逻辑处理
                 // 嗑药需要保证开关打开 BP小于阀值
-                if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOUSEBPPOTION) || account.getBp() < Integer.parseInt(marzSettingEvt.getAutoUseBPPotionBPLimit()))
+                if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOUSEBPPOTION) && account.getBp() < Integer.parseInt(marzSettingEvt.getAutoUseBPPotionBPLimit()))
                 {
                     // 查看当前药水数量
                     int bpNum = 0;
-                    boolean itemUseFlag = true;
+                    itemUseFlag = true;
                     for (ItemEvt item : itemList)
                     {
                         if (item.getItemId().equals(marzSettingEvt.getAutoUseBPPotionItemId()))
@@ -603,24 +605,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         }
                     }
                     
-                    if (itemUseFlag)
-                    {
-                        // 有药水了可以直接嗑药
-                        map = request.itemUse(sid, marzSettingEvt.getAutoUseBPPotionItemId());
-                        
-                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                        
-                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-                        {
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水使用成功！");
-                            
-                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            
-                            JSONObject user = map.get(MarzConstant.JSON_TAG_ITEMUSE);
-                            account.setBp(user.getJSONObject("user").getInt("bp"));
-                            this.saveAccount(account);
-                        }
-                    }
+                    // 喝药水转移到打副本那块逻辑去了
                 }
             }
             
@@ -756,9 +741,12 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     cardList.add(new CardEvt(cardJSON));
                 }
                 
+                // add by Ken 2015-7-9 进化材料单独变成数量统计
+                // cardShow2接口中的1
+                
                 // add by Ken 2015-6-3 for PVP & Solo
-                // cardShow2接口中 decks → 1
-                JSONArray decksJSON = cardShowJSON.getJSONArray("1");
+                // cardShow2接口中 decks → 2
+                JSONArray decksJSON = cardShowJSON.getJSONArray("2");
                 deckMap = new HashMap<String, String>();
                 JSONObject deckJSON;
                 DeckEvt deckEvt;
@@ -1473,7 +1461,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     // 拿石模式只处理Event副本
                     for (MarzMapEvt map : eventMapList)
                     {
-                        // 首先过滤掉 8开头的钥匙副本
+                        // TODO 首先过滤掉 8开头的钥匙副本
                         if (map.getBossId().startsWith("8"))
                         {
                             continue;
@@ -1481,7 +1469,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         
                         // 如果地图的标志为标明未通过 并且体力够打这个图 那么就打这个
                         if ((MarzConstant.MARZMAP_STATE_0.equals(map.getState()) || MarzConstant.MARZMAP_STATE_1.equals(map.getState()))
-                                && account.getBp() >= map.getBpCost())
+                                && account.getBpMax() >= map.getBpCost())
                         {
                             mapEvt = map;
                             break;
@@ -1500,7 +1488,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     {
                         for (MarzMapEvt m : battleMapList)
                         {
-                            if (id.equals(m.getBossId()) && account.getBp() >= m.getBpCost())
+                            if (id.equals(m.getBossId()) && account.getBpMax() >= m.getBpCost())
                             {
                                 mapEvt = m;
                                 MarzMapReq mapReq = new MarzMapReq();
@@ -1526,7 +1514,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 if (CommonUtil.isEmpty(mapEvt.getBossId()))
                 {
                     // 是否启用不浪费BP
-                    if (validateSetting(MarzConstant.VALIDATE_SETTING_BATTLE_NOWASTE) && (account.getBpMax() - account.getBp()) < 3)
+                    if (validateSetting(MarzConstant.VALIDATE_SETTING_BATTLE_NOWASTE) && account.getBpMax() == account.getBp())
                     {
                         // 不浪费BP打的地图为空或者为日限轮询的0时
                         if (CommonUtil.isEmpty(marzSettingEvt.getBattleNowasteBossId()) || "0".equals(marzSettingEvt.getBattleNowasteBossId()))
@@ -1583,9 +1571,34 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 // 校验数据
                 if  (!CommonUtil.isEmpty(mapEvt.getBossId()))
                 {
+                    
+                    if (itemUseFlag && account.getBp() < mapEvt.getBpCost())
+                    {
+                        // 有药水了可以直接嗑药
+                        map = request.itemUse(sid, marzSettingEvt.getAutoUseBPPotionItemId());
+                        
+                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                        
+                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                        {
+                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                            
+                            JSONObject user = map.get(MarzConstant.JSON_TAG_ITEMUSE);
+                            account.setBp(user.getJSONObject("user").getInt("bp"));
+                            this.saveAccount(account);
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水使用成功！BP变为：" + user.getJSONObject("user").getInt("bp"));
+                        }
+                    }
+                    
                 	// update by ken 20150621 战斗改为一次性循环打完所有BP
                     do
                     {
+                        if (account.getBp() < mapEvt.getBpCost())
+                        {
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_1, "体力不足，停止战斗！目标副本：" + mapEvt.getBossName() + " 当前体力：" + account.getBp() + " 副本需要：" + mapEvt.getBpCost());
+                            break;
+                        }
+                        
                     	map = request.teamBattleSoloStart(sid, mapEvt.getBossId(), arthur1, arthur2, arthur4);
                         
                         resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
@@ -1595,6 +1608,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
                         {
                             sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                            account.setBp(account.getBp() - mapEvt.getBpCost());
                             
                             String battleEndParam = "";
                             if (0 == mapEvt.getTarget())
@@ -1641,19 +1655,41 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                 this.jsonUser(account, user);
                                 this.saveAccount(account);
                                 
-                                JSONArray new_cards = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOEND).getJSONArray("new_cards");
-                                for (int i = 0; i < new_cards.size(); i++)
+                                JSONArray result_rewards = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOEND).getJSONArray("result_rewards");
+                                JSONObject reward;
+                                
+                                if (null != result_rewards)
                                 {
-                                    newCardIdList.add(new_cards.getJSONObject(i).getString("cardid"));
+                                    for (int i = 0; i < result_rewards.size(); i++)
+                                    {
+                                        reward = result_rewards.getJSONObject(i);
+                                        if (reward.getJSONObject("reward").getInt("type") == 6
+                                                || reward.getJSONObject("reward").getInt("type") == 13)
+                                        {
+                                            newCardIdList.add(reward.getJSONObject("reward").getString("reward_typeid"));
+                                        }
+                                    }
                                 }
                             }
                             
                             this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_1, "战斗结束" + MarzUtil.resultCodeStr(resultCode) + " 目标副本 " + mapEvt.getBossName() + " 战斗获得 " + MarzUtil.getFaceImageUrlByIdList(newCardIdList));
+                            
+                            // 如果嗑药时 勾选了不浪费BP 打的是需要跳出
+                            if (validateSetting(MarzConstant.VALIDATE_SETTING_BATTLE_NOWASTE))
+                            {
+                                // TODO 看是否有必要添加
+                            }
+                        }
+                        else
+                        {
+                            // 战斗失败 跳出
+                            break;
                         }
                     }
-                    while (MarzConstant.RES_CODE_SUCCESS_0 == resultCode && account.getBp() >= mapEvt.getBpCost()
-                            && !marzSettingEvt.getBattleNowasteBossId().equals(mapEvt.getBossId()) // 如果这个图是不浪费BP刷的图 则只刷一次
-                            && !"0".equals(marzSettingEvt.getBattleNowasteBossId()) // 如果选择7合1也要过滤
+                    while (MarzConstant.RES_CODE_SUCCESS_0 == resultCode
+                            && account.getBp() >= mapEvt.getBpCost()
+                            //&& !marzSettingEvt.getBattleNowasteBossId().equals(mapEvt.getBossId()) // 如果这个图是不浪费BP刷的图 则只刷一次
+                            //&& !(CommonUtil.isEmpty(marzSettingEvt.getBattleNowasteBossId()) || "0".equals(marzSettingEvt.getBattleNowasteBossId())) // 如果选择7合1也要过滤
                     		&& MarzConstant.MARZMAP_STATE_2.equals(mapEvt.getState())); // 练级模式以及拿石模式下 第一次打的图不重复刷
                 }
                 else
