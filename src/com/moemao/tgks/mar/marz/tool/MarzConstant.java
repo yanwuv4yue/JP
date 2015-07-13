@@ -82,6 +82,7 @@ public class MarzConstant
     public static final int VALIDATE_SETTING_AUTOBUYBPPOTION = 16; // 自动买药
     public static final int VALIDATE_SETTING_CARDSELL_EVO = 17; // 进化素材出售开关
     public static final int VALIDATE_SETTING_CARDSELL_EVONUM = 18; // 进化素材保留数量
+    public static final int VALIDATE_SETTING_BATTLE_LEVEL_UP = 19; // 进化素材保留数量
     
     /**
      * MARZACCOUNT 账号类型 0 IOS
