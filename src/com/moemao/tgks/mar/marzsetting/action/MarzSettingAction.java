@@ -234,6 +234,10 @@ public class MarzSettingAction extends TGKSAction
                 {
                     marzSettingEvt.setCardSellEvoNum(setting.getValue());
                 }
+                else if (MarzConstant.VALIDATE_SETTING_BATTLE_LEVEL_UP == Integer.parseInt(setting.getName()))
+                {
+                    marzSettingEvt.setBattleLevelUp(setting.getValue());
+                }
             }
         }
         
@@ -525,6 +529,14 @@ public class MarzSettingAction extends TGKSAction
         setting.setType(MarzConstant.MARZSETTING_TYPE_1);
         setting.setName(String.valueOf(MarzConstant.VALIDATE_SETTING_CARDSELL_EVONUM));
         setting.setValue(marzSettingEvt.getCardSellEvoNum());
+        this.mar_marzSettingService.addMarzSetting(setting);
+        
+        // 练级模式
+        setting = new MarzSettingEvt();
+        setting.setTgksId(tgksId);
+        setting.setType(MarzConstant.MARZSETTING_TYPE_0);
+        setting.setName(String.valueOf(MarzConstant.VALIDATE_SETTING_BATTLE_LEVEL_UP));
+        setting.setValue(marzSettingEvt.getBattleLevelUp());
         this.mar_marzSettingService.addMarzSetting(setting);
         
         return SUCCESS;
