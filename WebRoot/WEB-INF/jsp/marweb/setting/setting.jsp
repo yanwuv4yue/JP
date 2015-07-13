@@ -152,6 +152,13 @@
                          <option value="1" <s:if test="marzSettingEvt.battle == 1">selected="selected"</s:if>>开</option>
                     </select>
                 </td>
+                <td>优先练级</td>
+                <td>
+                    <select id="marzSettingEvt.battleLevelUp" name="marzSettingEvt.battleLevelUp">
+                         <option value="0">关</option>
+                         <option value="1" <s:if test="marzSettingEvt.battleLevelUp == 1">selected="selected"</s:if>>开</option>
+                    </select>
+                </td>
                 <td>优先拿水晶</td>
                 <td>
                     <select id="marzSettingEvt.battleGetStone" name="marzSettingEvt.battleGetStone">
@@ -177,7 +184,6 @@
                          </s:iterator>
                     </select>
                 </td>
-                <td></td><td></td>
             </tr>
             <tr>
                 <td>战斗副本</td>
