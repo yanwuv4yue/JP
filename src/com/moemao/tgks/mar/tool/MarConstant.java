@@ -245,6 +245,7 @@ public class MarConstant
      * 初始地图
      */
     public static final String BATTLESOLOSTART_FIRST = "10000101";
+    public static final String BATTLESOLOSTART_17_3 = "10001703";
 
     public static final String BATTLE_START_CHIARI_HEAD = "2000000";
     public static final String BATTLE_START_CHIARI = "20000002";
