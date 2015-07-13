@@ -63,6 +63,8 @@ private String cardSellEvo;
 
 private String cardSellEvoNum;
 
+private String battleLevelUp;
+
 
 private String bossIds;
 
@@ -364,6 +366,16 @@ public String getCardSellEvoNum()
 public void setCardSellEvoNum(String cardSellEvoNum)
 {
 	this.cardSellEvoNum = cardSellEvoNum;
+}
+
+public String getBattleLevelUp()
+{
+    return battleLevelUp;
+}
+
+public void setBattleLevelUp(String battleLevelUp)
+{
+    this.battleLevelUp = battleLevelUp;
 }
 
 }
