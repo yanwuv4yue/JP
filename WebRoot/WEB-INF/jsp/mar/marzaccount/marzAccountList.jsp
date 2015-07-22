@@ -28,7 +28,8 @@
                     <td><s:property value='#evt.tgksId'/></td>
                     <td>
                         <s:if test="#evt.type == 0">IOS</s:if>
-                        <s:elseif test="#evt.type == 1">Android</s:elseif>
+                        <s:elseif test="#evt.type == 1">GP</s:elseif>
+                        <s:elseif test="#evt.type == 2">SE</s:elseif>
                     </td>
                     <td>
                         <s:if test="#evt.vip == 0">试用</s:if>

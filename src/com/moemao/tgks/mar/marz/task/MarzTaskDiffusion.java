@@ -452,6 +452,10 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             {
                 map = request.loginAndroid(account.getUuid(), account.getHashToken());
             }
+            else if (MarzConstant.MARZ_ACCOUNT_TYPE_2.equals(account.getType()))
+            {
+                map = request.loginAndroidSE(account.getUuid(), account.getHashToken());
+            }
             else
             {
                 map = request.loginIOS(account.getUuid(), account.getHashToken());

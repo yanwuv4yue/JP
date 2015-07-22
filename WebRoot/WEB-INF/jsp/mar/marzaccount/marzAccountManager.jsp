@@ -18,7 +18,8 @@
 	                <select name="marzAccountReq.type">
                         <option value="">全部</option>
 		                <option value="0">IOS</option>
-		                <option value="1">Android</option>
+                        <option value="1">GP</option>
+                        <option value="2">SE</option>
 	                </select>
                 </td>
                 <td><label>状态: </label></td>

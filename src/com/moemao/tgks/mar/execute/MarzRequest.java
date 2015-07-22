@@ -82,6 +82,28 @@ public class MarzRequest
         return map;
     }
     
+    public Map<String, JSONObject> loginAndroidSE(String uuid, String hashToken) throws Exception
+    {
+        map = new HashMap<String, JSONObject>();
+        
+        //String paramStr = "{\"uuid\":\"" + uuid + "\",\"clver\":\"2\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"samsung GT-N7100\",\"token\":\"\"}";
+        //String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"3\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\"}";
+        //String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"4\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
+        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"9\",\"os\":1,\"carrier\":1,\"market\":3,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
+        
+        String result = httpRequest.sendPost(MarConstant.URL_LOGIN, paramStr);
+        System.out.println(MarzConstant.LOG_SYSTEM_INFO + "loginAndroidSE " + uuid + " " + Thread.currentThread().getName());
+
+        JSONObject resCode= JSONObject.fromObject(result);
+        
+        map.put(MarzConstant.JSON_TAG_SID, this.sidJSONObject(resCode.getString("sess_key").replace("=", "")));
+        map.put(MarzConstant.JSON_TAG_RESCODE, resCode);
+        
+        result = null;
+        resCode = null;
+        return map;
+    }
+    
     public Map<String, JSONObject> inviteCodeEnter(String sid, String inviteCode) throws Exception
     {
         map = new HashMap<String, JSONObject>();

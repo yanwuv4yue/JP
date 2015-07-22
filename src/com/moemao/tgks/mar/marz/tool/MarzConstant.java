@@ -89,9 +89,13 @@ public class MarzConstant
      */
     public static final String MARZ_ACCOUNT_TYPE_0 = "0";
     /**
-     * MARZACCOUNT 账号类型 1 Android
+     * MARZACCOUNT 账号类型 1 Android GP
      */
     public static final String MARZ_ACCOUNT_TYPE_1 = "1";
+    /**
+     * MARZACCOUNT 账号类型 2 Android SE
+     */
+    public static final String MARZ_ACCOUNT_TYPE_2 = "2";
     
     /**
      * MARZACCOUNT 登录状态 0 离线

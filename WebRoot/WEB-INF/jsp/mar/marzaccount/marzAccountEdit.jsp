@@ -22,7 +22,8 @@
 		<td>
 		    <select name="marzAccountEvt.type">
 				<option value="0" <s:if test="marzAccountEvt.type == 0">selected="selected"</s:if>>IOS</option>
-				<option value="1" <s:if test="marzAccountEvt.type == 1">selected="selected"</s:if>>Android</option>
+                <option value="1" <s:if test="marzAccountEvt.type == 1">selected="selected"</s:if>>安卓GP</option>
+                <option value="2" <s:if test="marzAccountEvt.type == 2">selected="selected"</s:if>>安卓SE</option>
 		     </select>
 	     </td>
 	</tr>
