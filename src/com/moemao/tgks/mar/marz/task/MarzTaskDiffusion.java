@@ -82,7 +82,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     
     public boolean running = true;
     
-    boolean itemUseFlag = true;
+    boolean itemUseFlag = false;
     
     public MarzTaskDiffusion(MarzAccountEvt marzAccountEvt)
     {
@@ -1363,9 +1363,10 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 JSONObject groupJSON;
                 JSONArray bossArray;
                 JSONObject bossJSON;
-
+                String arthurType = "3";
                 String arthur1 = "";
                 String arthur2 = "";
+                String arthur3 = "";
                 String arthur4 = "";
                 
                 JSONArray battleMapNormal = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOSHOW).getJSONArray("normal_groups");                
@@ -1388,7 +1389,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     }
                     else if (3 == arthur.getInt("arthur_type"))
                     {
-                        //arthur3 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                        arthur3 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
                     }
                     else if (4 == arthur.getInt("arthur_type"))
                     {
@@ -1695,7 +1696,33 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             break;
                         }
                         
-                    	map = request.teamBattleSoloStart(sid, bossEvt.getBossId(), arthur1, arthur2, arthur4);
+                        // add by ken 20150810 for solo map
+                        if (bossEvt.getBossId().startsWith(MarConstant.BOSSID_HEAD_PROCESS1_SOLO_KEY))
+                        {
+                            arthur1 = account.getUserId();
+                            arthur2 = account.getUserId();
+                            arthur3 = account.getUserId();
+                            arthur4 = account.getUserId();
+                            
+                            if (bossEvt.getBossName().startsWith("傭兵"))
+                            {
+                                arthurType = "1";
+                            }
+                            else if (bossEvt.getBossName().startsWith("富豪"))
+                            {
+                                arthurType = "2";
+                            }
+                            else if (bossEvt.getBossName().startsWith("盗賊"))
+                            {
+                                arthurType = "3";
+                            }
+                            else if (bossEvt.getBossName().startsWith("歌姫"))
+                            {
+                                arthurType = "4";
+                            }
+                        }
+                        
+                    	map = request.teamBattleSoloStart(sid, bossEvt.getBossId(), arthurType, arthur1, arthur2, arthur3, arthur4);
                         
                         resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                         

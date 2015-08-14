@@ -171,6 +171,17 @@ public class MarzCardAction extends TGKSAction
     
     public String marzCardUsePage()
     {
+        String tgksId = CommonUtil.getUserInfoBySession().getUsername();
+        MarzAccountReq marzAccountReq = new MarzAccountReq();
+        marzAccountReq.setTgksId(tgksId);
+        List<MarzAccountEvt> acctList = this.mar_marzAccountService.queryMarzAccount(marzAccountReq);
+        
+        // add by ken 20150804 for settingPage 500 error
+        if (CommonUtil.isEmpty(acctList))
+        {
+            return ERROR;
+        }
+        
         return SUCCESS;
     }
     

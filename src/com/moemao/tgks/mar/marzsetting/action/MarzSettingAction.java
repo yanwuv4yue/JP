@@ -247,7 +247,16 @@ public class MarzSettingAction extends TGKSAction
         noWasteMapList = new ArrayList<MarzMapEvt>();
         MarzAccountReq marzAccountReq = new MarzAccountReq();
         marzAccountReq.setTgksId(tgksId);
-        account = this.mar_marzAccountService.queryMarzAccount(marzAccountReq).get(0);
+        List<MarzAccountEvt> acctList = this.mar_marzAccountService.queryMarzAccount(marzAccountReq);
+        
+        // add by ken 20150804 for settingPage 500 error
+        if (CommonUtil.isEmpty(acctList))
+        {
+            return ERROR;
+        }
+        
+        account = acctList.get(0);
+        
         for (MarzMapEvt map : allMapList)
         {
             if (!CommonUtil.isEmpty(account.getBossIds()))

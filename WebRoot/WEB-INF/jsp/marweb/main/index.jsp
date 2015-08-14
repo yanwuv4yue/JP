@@ -50,7 +50,7 @@
 	    _(:з」∠)_ 我是日志
 	</div>
 </div>
-
+<img src="http://i1.tietuku.com/636cbc19cf96d2f5.png" style="position: fixed; right: 0; bottom: 0; z-index: 9999;" onclick="$(this).hide();">
 <script type="text/javascript">
 $(document).ready(function(){
     main();

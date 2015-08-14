@@ -264,6 +264,8 @@ public class MarConstant
     public static final String BOSSID_HEAD_PROCESS3_DAILY_KEY = "8490";
     public static final String BOSSID_HEAD_PROCESS1_DRAGON_KEY = "830";
     public static final String BOSSID_HEAD_PROCESS1_EVENT_KEY = "840";
+    
+    public static final String BOSSID_HEAD_PROCESS1_SOLO_KEY = "490";
 
     public static final String BATTLE_START_MONDAY = "21005003";
     public static final String BATTLE_START_TUESDAY = "21001003";
