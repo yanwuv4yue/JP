@@ -1,5 +1,7 @@
 package com.moemao.tgks.mar.marzaccount.action;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +21,8 @@ import com.moemao.tgks.mar.marzaccount.service.MarzAccountService;
 import com.moemao.tgks.mar.marzmap.entity.MarzMapEvt;
 import com.moemao.tgks.mar.marzmap.entity.MarzMapReq;
 import com.moemao.tgks.mar.marzmap.service.MarzMapService;
+import com.moemao.tgks.mar.marzserver.entity.MarzServerEvt;
+import com.moemao.tgks.mar.marzserver.service.MarzServerService;
 import com.moemao.tgks.mar.tool.MarConstant;
 
 public class MarzAccountAction extends TGKSAction
@@ -35,8 +39,10 @@ public class MarzAccountAction extends TGKSAction
      * ﻿MarzAccount业务接口
      */
     private MarzAccountService mar_marzAccountService;
-    
+
     private MarzMapService mar_marzMapService;
+    
+    private MarzServerService mar_marzServerService;
     
     /**
      * 查询结果集
@@ -159,6 +165,28 @@ public class MarzAccountAction extends TGKSAction
             marzAccountEvt.setStatus(MarzConstant.MARZ_ACCOUNT_STATUS_1);
             marzAccountEvt.setSessionId("");
             marzAccountEvt.setRemark("");
+            
+            // add by ken 20150821 for 负载均衡后添加服务器名称以及IP地址
+            try
+            {
+                String ip = InetAddress.getLocalHost().getHostAddress().toString();
+                MarzServerEvt marzServerEvt = mar_marzServerService.queryMarzServerByLoaclIp(ip);
+                if (CommonUtil.isEmpty(marzServerEvt))
+                {
+                    marzAccountEvt.setServerName("unknowServer");
+                    marzAccountEvt.setIpAddress("unknowIp");
+                }
+                else
+                {
+                    marzAccountEvt.setServerName(marzServerEvt.getServerName());
+                    marzAccountEvt.setIpAddress(marzServerEvt.getLoaclIp());
+                }
+            }
+            catch (UnknownHostException e)
+            {
+                e.printStackTrace();
+            }
+            
             mar_marzAccountService.updateMarzAccount(marzAccountEvt);
         }
         else
@@ -201,6 +229,8 @@ public class MarzAccountAction extends TGKSAction
             marzAccountEvt.setFp(0);
             marzAccountEvt.setGold(0);
             marzAccountEvt.setSessionId("");
+            marzAccountEvt.setServerName("");
+            marzAccountEvt.setIpAddress("");
             marzAccountEvt.setRemark("");
             mar_marzAccountService.updateMarzAccount(marzAccountEvt);
         }
@@ -235,6 +265,8 @@ public class MarzAccountAction extends TGKSAction
                 acc.setFp(0);
                 acc.setGold(0);
                 acc.setSessionId("");
+                acc.setServerName("");
+                acc.setIpAddress("");
                 acc.setRemark("");
                 mar_marzAccountService.updateMarzAccount(acc);
             }
@@ -252,6 +284,26 @@ public class MarzAccountAction extends TGKSAction
                     acc.setStatus(MarzConstant.MARZ_ACCOUNT_STATUS_1);
                     acc.setSessionId("");
                     acc.setRemark("");
+                    // add by ken 20150821 for 负载均衡后添加服务器名称以及IP地址
+                    try
+                    {
+                        String ip = InetAddress.getLocalHost().getHostAddress().toString();
+                        MarzServerEvt marzServerEvt = mar_marzServerService.queryMarzServerByLoaclIp(ip);
+                        if (CommonUtil.isEmpty(marzServerEvt))
+                        {
+                            acc.setServerName("unknowServer");
+                            acc.setIpAddress("unknowIp");
+                        }
+                        else
+                        {
+                            acc.setServerName(marzServerEvt.getServerName());
+                            acc.setIpAddress(marzServerEvt.getLoaclIp());
+                        }
+                    }
+                    catch (UnknownHostException e)
+                    {
+                        e.printStackTrace();
+                    }
                     mar_marzAccountService.updateMarzAccount(acc);
                 }
                 else
@@ -379,6 +431,16 @@ public class MarzAccountAction extends TGKSAction
     public void setMar_marzMapService(MarzMapService mar_marzMapService)
     {
         this.mar_marzMapService = mar_marzMapService;
+    }
+
+    public MarzServerService getMar_marzServerService()
+    {
+        return mar_marzServerService;
+    }
+
+    public void setMar_marzServerService(MarzServerService mar_marzServerService)
+    {
+        this.mar_marzServerService = mar_marzServerService;
     }
 
 }

@@ -66,9 +66,11 @@
 	    </tr>
 	    <tr>
 	        <td>售卡列表</td>
-	        <td>${marzAccountEvt.sellCardIds }</td>
+	        <td colspan="5">${marzAccountEvt.sellCardIds }</td>
+        </tr>
+        <tr>
 	        <td>名声列表</td>
-	        <td>${marzAccountEvt.fameCardIds }</td>
+	        <td colspan="5">${marzAccountEvt.fameCardIds }</td>
 	    </tr>
 	    <tr>
 	        <td>道具信息</td>

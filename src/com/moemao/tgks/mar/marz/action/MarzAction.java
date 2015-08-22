@@ -1,5 +1,7 @@
 package com.moemao.tgks.mar.marz.action;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import com.moemao.tgks.common.core.action.TGKSAction;
@@ -14,12 +16,28 @@ public class MarzAction extends TGKSAction
     
     private List<String> marzThreadList;
     
+    private String ipAddress;
+    
     public String marzThreadPoolManager()
     {
-        // TODO 查询当前线程池状态
+        // 查询当前线程池状态
         marzThreadList = MarzThreadPoolDiffusion.getInstance().showAllThread();
         
+        // 本机IP
+        try
+        {
+            ipAddress = InetAddress.getLocalHost().getHostAddress().toString();
+            System.out.println("服务器本地IP：" + ipAddress);
+        }
+        catch (UnknownHostException e)
+        {
+            e.printStackTrace();
+            return SUCCESS;
+        }
+        
         // TODO 查询前100条marzLog记录
+        
+        // TODO 图标等等
         
         return SUCCESS;
     }
@@ -63,5 +81,15 @@ public class MarzAction extends TGKSAction
     public void setMarzThreadList(List<String> marzThreadList)
     {
         this.marzThreadList = marzThreadList;
+    }
+
+    public String getIpAddress()
+    {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress)
+    {
+        this.ipAddress = ipAddress;
     }
 }

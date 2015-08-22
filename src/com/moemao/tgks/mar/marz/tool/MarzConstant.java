@@ -245,4 +245,24 @@ public class MarzConstant
      * MARZ PVP PROCESS 3 三回合
      */
     public static final int MARZMAP_PROCESS_3 = 3;
+    
+    /**
+     * MARZ SERVER STATUS 0 已停止
+     */
+    public static final String MARZSERVER_STATUS_0 = "0";
+    
+    /**
+     * MARZ SERVER STATUS 1 运行中
+     */
+    public static final String MARZSERVER_STATUS_1 = "1";
+    
+    /**
+     * MARZ SERVER ACCEPT 0 禁止
+     */
+    public static final String MARZSERVER_ACCEPT_0 = "0";
+    
+    /**
+     * MARZ SERVER ACCEPT 1 允许
+     */
+    public static final String MARZSERVER_ACCEPT_1 = "1";
 }

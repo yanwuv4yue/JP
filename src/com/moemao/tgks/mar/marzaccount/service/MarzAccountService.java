@@ -9,7 +9,7 @@ public interface MarzAccountService
 {
 public List<MarzAccountEvt> queryMarzAccount(MarzAccountReq marzAccountReq);
 
-public List<MarzAccountEvt> queryMarzAccountOnline();
+public List<MarzAccountEvt> queryMarzAccountOnline(String ip);
 
 public List<MarzAccountEvt> queryMarzAccountByIds(List<String> ids);
 
@@ -18,6 +18,8 @@ public MarzAccountEvt queryMarzAccountById(String id);
 public int addMarzAccount(MarzAccountEvt marzAccountEvt);
 
 public int updateMarzAccount(MarzAccountEvt marzAccountEvt);
+
+public int updateMarzAccountEndTime(MarzAccountEvt marzAccountEvt);
 
 public int deleteMarzAccount(List<String> ids);
 

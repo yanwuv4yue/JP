@@ -1,5 +1,7 @@
 package com.moemao.tgks.marweb.login.action;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Map;
 
@@ -7,12 +9,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.moemao.tgks.common.core.action.TGKSAction;
+import com.moemao.tgks.common.core.spring.ContextUtil;
 import com.moemao.tgks.common.tool.CommonConstant;
 import com.moemao.tgks.common.tool.CommonUtil;
 import com.moemao.tgks.common.ums.tool.UmsConstant;
 import com.moemao.tgks.common.ums.user.entity.UserEvt;
 import com.moemao.tgks.common.ums.user.entity.UserReq;
 import com.moemao.tgks.common.ums.user.service.UserService;
+import com.moemao.tgks.mar.marz.tool.MarzConstant;
+import com.moemao.tgks.mar.marzaccount.entity.MarzAccountEvt;
+import com.moemao.tgks.mar.marzaccount.entity.MarzAccountReq;
+import com.moemao.tgks.mar.marzaccount.service.MarzAccountService;
+import com.moemao.tgks.mar.marzserver.entity.MarzServerEvt;
+import com.moemao.tgks.mar.marzserver.service.MarzServerService;
 import com.moemao.tgks.marweb.tool.MarwebConstant;
 import com.opensymphony.xwork2.ActionContext;
 
@@ -36,6 +45,10 @@ public class LoginAction extends TGKSAction
     private UserReq userReq = new UserReq();
     
     private String message;
+    
+    private String userId;
+    
+    private String ipAddress;
     
     /**
      * 
@@ -76,9 +89,89 @@ public class LoginAction extends TGKSAction
             return ERROR;
         }
         
-        CommonUtil.systemLog("marweb/login.action", CommonConstant.SYSTEMLOG_TYPE_0, CommonConstant.SUCCESS, String.format("账号：%s 登录marweb成功", userReq.getUsername()));
-        CommonUtil.infoLog(logger, CommonConstant.SYSTEM_INFO_LOG_LOGIN_SUCCESS, String.format("账号：%s 密码：%s", userReq.getUsername(), "_(:з」∠)_"));
-        CommonUtil.debugLog(logger, CommonConstant.SYSTEM_INFO_LOG_METHOD_OUT, "LoginAction.login");
+        // 登录成功 下面进行负载均衡判断
+        userId = userEvt.getId();
+        String tgksId=  userEvt.getUsername();
+        
+        MarzAccountService marzAccountService = (MarzAccountService) ContextUtil.getBean("mar_marzAccountService");
+        MarzAccountReq marzAccountReq = new MarzAccountReq();
+        marzAccountReq.setTgksId(tgksId);
+        marzAccountReq.setStatus(MarzConstant.MARZ_ACCOUNT_STATUS_1);
+        List<MarzAccountEvt> list = marzAccountService.queryMarzAccount(marzAccountReq);
+        
+        if (!CommonUtil.isEmpty(list))
+        {
+            // 如果查到正在运行的账号 则直接跳转到目标机子上
+            ipAddress = list.get(0).getIpAddress();
+            return LOGIN;
+        }
+        
+        // 如果账号没有运行中的线程 则查询负载最小的服务器并跳转
+        MarzServerService marzServerService = (MarzServerService) ContextUtil.getBean("mar_marzServerService");
+        MarzServerEvt marzServerEvt = marzServerService.queryMarzServerForMin();
+        if (CommonUtil.isEmpty(marzServerEvt))
+        {
+            // 没有可用服务器时 让用户登录当前服务器
+            return SUCCESS;
+        }
+        else
+        {
+            // 有可用服务器时 看是否与当前服务器IP相同
+            try
+            {
+                // 获取本机IP
+                String ip = InetAddress.getLocalHost().getHostAddress().toString();
+                if (ip.equals(marzServerEvt.getLoaclIp()))
+                {
+                    // 如果与本机相同 直接登录本机
+                    return SUCCESS;
+                }
+                else
+                {
+                    ipAddress = marzServerEvt.getLoaclIp();
+                }
+            }
+            catch (UnknownHostException e)
+            {
+                e.printStackTrace();
+            }
+            
+            return LOGIN;
+        }
+    }
+    
+    /**
+     * 
+     * @Title: loginChanged
+     * @Description: MARWEB登录 被负载均衡带过来的
+     * @return
+     * @return String 返回类型
+     * @throws
+     */
+    public String loginChanged()
+    {
+        userId = this.getRequest().getParameter("userId");
+        
+        userReq = new UserReq();
+        userReq.setId(userId);
+        
+        // 账户登录
+        List<UserEvt> userList = ums_userService.queryUser(userReq);
+        
+        if (null != userList && userList.size() > 0)
+        {
+            userEvt = userList.get(0);
+            
+            Map<String, Object> session = ActionContext.getContext().getSession();
+            session.put(CommonConstant.USER_INFO, userEvt);
+        }
+        else
+        {
+            message = "登录失败";
+            
+            return ERROR;
+        }
+        
         return SUCCESS;
     }
     
@@ -196,5 +289,25 @@ public class LoginAction extends TGKSAction
     public void setMessage(String message)
     {
         this.message = message;
+    }
+
+    public String getIpAddress()
+    {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress)
+    {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getUserId()
+    {
+        return userId;
+    }
+
+    public void setUserId(String userId)
+    {
+        this.userId = userId;
     }
 }

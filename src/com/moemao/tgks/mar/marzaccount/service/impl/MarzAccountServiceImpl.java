@@ -27,10 +27,11 @@ public class MarzAccountServiceImpl implements MarzAccountService
         return mar_marzAccountDao.mar_queryMarzAccount(marzAccountReq);
     }
     
-    public List<MarzAccountEvt> queryMarzAccountOnline()
+    public List<MarzAccountEvt> queryMarzAccountOnline(String ip)
     {
         MarzAccountReq marzAccountReq = new MarzAccountReq();
         marzAccountReq.setStatus(MarzConstant.MARZ_ACCOUNT_STATUS_1);
+        marzAccountReq.setIpAddress(ip);
         marzAccountReq.setEndTime(new Date());
         marzAccountReq.setSortSql(" t.ID");
         return mar_marzAccountDao.mar_queryMarzAccount(marzAccountReq);
@@ -64,6 +65,11 @@ public class MarzAccountServiceImpl implements MarzAccountService
     public int updateMarzAccount(MarzAccountEvt marzAccountEvt)
     {
         return mar_marzAccountDao.mar_updateMarzAccount(marzAccountEvt);
+    }
+    
+    public int updateMarzAccountEndTime(MarzAccountEvt marzAccountEvt)
+    {
+        return mar_marzAccountDao.mar_updateMarzAccountEndTime(marzAccountEvt);
     }
     
     public int deleteMarzAccount(List<String> ids)

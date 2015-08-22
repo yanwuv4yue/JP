@@ -51,6 +51,12 @@
         <td>${marzAccountEvt.sessionId }</td>
     </tr>
     <tr>
+        <td>服务器名称</td>
+        <td><input type="text" name="marzAccountEvt.serverName" value="${marzAccountEvt.serverName }" /></td>
+        <td>服务器IP</td>
+        <td><input type="text" name="marzAccountEvt.ipAddress" value="${marzAccountEvt.ipAddress }" /></td>
+    </tr>
+    <tr>
         <td>角色名</td>
         <td>${marzAccountEvt.name }</td>
         <td>VIP等级</td>

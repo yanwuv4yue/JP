@@ -13,6 +13,8 @@
         <result property="type" column="TYPE" />
         <result property="status" column="STATUS" />
         <result property="sessionId" column="SESSIONID" />
+        <result property="serverName" column="SERVERNAME" />
+        <result property="ipAddress" column="IPADDRESS" />
         <result property="vip" column="VIP" />
         <result property="name" column="NAME" />
         <result property="userId" column="USERID" />

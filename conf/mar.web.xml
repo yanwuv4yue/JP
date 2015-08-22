@@ -364,5 +364,31 @@
         <result name="success">/WEB-INF/jsp/common/success.jsp</result>
         <result name="error">/WEB-INF/jsp/common/error.jsp</result>
     </action>
+    
+    <!-- mar_marzserver -->
+    <action name="marzServerManager" class="com.moemao.tgks.mar.marzserver.action.MarzServerAction" method="marzServerManager">
+        <result name="success">/WEB-INF/jsp/mar/marzserver/marzServerManager.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+
+    <action name="queryMarzServer" class="com.moemao.tgks.mar.marzserver.action.MarzServerAction" method="queryMarzServer">
+        <result name="success">/WEB-INF/jsp/mar/marzserver/marzServerList.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+
+    <action name="editMarzServerPage" class="com.moemao.tgks.mar.marzserver.action.MarzServerAction" method="editMarzServerPage">
+        <result name="success">/WEB-INF/jsp/mar/marzserver/marzServerEdit.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+
+    <action name="editMarzServer" class="com.moemao.tgks.mar.marzserver.action.MarzServerAction" method="editMarzServer">
+        <result name="success">/WEB-INF/jsp/common/success.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+
+    <action name="deleteMarzServer" class="com.moemao.tgks.mar.marzserver.action.MarzServerAction" method="deleteMarzServer">
+        <result name="success">/WEB-INF/jsp/common/success.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
   </package>
 </struts>

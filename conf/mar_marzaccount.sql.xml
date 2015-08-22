@@ -5,7 +5,7 @@
 <mapper namespace="com.moemao.tgks.mar.marzaccount.dao.MarzAccountDao">
 <select id="mar_queryMarzAccount" parameterType="MarzAccountReq" resultType="MarzAccountEvt" resultMap="MarzAccountEvtMap">
         <![CDATA[  
-            SELECT t.id, t.tgksid, t.uuid, t.hashtoken, t.accountKey, t.gachahash, t.type, t.status, t.sessionid, t.vip, t.name, t.userid, t.lv, t.ap, t.apmax, t.bp, t.bpmax, t.cardnum, t.cardmax, t.gold, t.fp, t.coin, t.bossids, t.sellCardIds, t.fameCardIds, t.itemInfo, t.createtime, t.endtime, t.remark FROM t_tgks_mar_marzaccount t
+            SELECT t.id, t.tgksid, t.uuid, t.hashtoken, t.accountKey, t.gachahash, t.type, t.status, t.sessionid, t.serverName, t.ipAddress, t.vip, t.name, t.userid, t.lv, t.ap, t.apmax, t.bp, t.bpmax, t.cardnum, t.cardmax, t.gold, t.fp, t.coin, t.bossids, t.sellCardIds, t.fameCardIds, t.itemInfo, t.createtime, t.endtime, t.remark FROM t_tgks_mar_marzaccount t
         ]]>
         <where>
                 1=1
@@ -29,6 +29,12 @@
             </if>
             <if test="sessionId !=null and sessionId !='' ">
                 AND t.SESSIONID = #{sessionId}
+            </if>
+            <if test="serverName !=null and serverName !='' ">
+                AND t.SERVERNAME = #{serverName}
+            </if>
+            <if test="ipAddress !=null and ipAddress !='' ">
+                AND t.IPADDRESS = #{ipAddress}
             </if>
             <if test="vip !=null and vip !='' ">
                 AND t.VIP = #{vip}
@@ -81,7 +87,7 @@
 
 <select id="mar_queryMarzAccountByIds" parameterType="list" resultType="MarzAccountEvt" resultMap="MarzAccountEvtMap">
         <![CDATA[  
-            SELECT t.id, t.tgksid, t.uuid, t.hashtoken, t.accountKey, t.gachahash, t.type, t.status, t.sessionid, t.vip, t.name, t.userid, t.lv, t.ap, t.apmax, t.bp, t.bpmax, t.cardnum, t.cardmax, t.gold, t.fp, t.coin, t.bossids, t.sellCardIds, t.fameCardIds, t.createtime, t.endtime, t.remark FROM t_tgks_mar_marzaccount t WHERE id IN
+            SELECT t.id, t.tgksid, t.uuid, t.hashtoken, t.accountKey, t.gachahash, t.type, t.status, t.sessionid, t.serverName, t.ipAddress, t.vip, t.name, t.userid, t.lv, t.ap, t.apmax, t.bp, t.bpmax, t.cardnum, t.cardmax, t.gold, t.fp, t.coin, t.bossids, t.sellCardIds, t.fameCardIds, t.createtime, t.endtime, t.remark FROM t_tgks_mar_marzaccount t WHERE id IN
         ]]>
         <foreach collection="list" item="ids"  open="(" separator="," close=")">
             #{ids}
@@ -90,8 +96,8 @@
 
 <insert id="mar_addMarzAccount" parameterType="MarzAccountEvt">
         <![CDATA[  
-            INSERT INTO t_tgks_mar_marzaccount (id, tgksid, uuid, hashToken, accountKey, gachaHash, type, status, sessionid, vip, name, userid, lv, ap, apmax, bp, bpmax, cardnum, cardmax, gold, fp, coin, bossids, sellCardIds, fameCardIds, itemInfo, createtime, endtime, remark) 
-            VALUES (#{id}, #{tgksId}, #{uuid}, #{hashToken}, #{accountKey}, #{gachaHash}, #{type}, #{status}, #{sessionId}, #{vip}, #{name}, #{userId}, #{lv}, #{ap}, #{apMax}, #{bp}, #{bpMax}, #{cardNum}, #{cardMax}, #{gold}, #{fp}, #{coin}, #{bossIds}, #{sellCardIds}, #{fameCardIds}, #{itemInfo}, #{createTime}, #{endTime}, #{remark}) 
+            INSERT INTO t_tgks_mar_marzaccount (id, tgksid, uuid, hashToken, accountKey, gachaHash, type, status, sessionid, serverName, ipAddress, vip, name, userid, lv, ap, apmax, bp, bpmax, cardnum, cardmax, gold, fp, coin, bossids, sellCardIds, fameCardIds, itemInfo, createtime, endtime, remark) 
+            VALUES (#{id}, #{tgksId}, #{uuid}, #{hashToken}, #{accountKey}, #{gachaHash}, #{type}, #{status}, #{sessionId}, #{serverName}, #{ipAddress}, #{vip}, #{name}, #{userId}, #{lv}, #{ap}, #{apMax}, #{bp}, #{bpMax}, #{cardNum}, #{cardMax}, #{gold}, #{fp}, #{coin}, #{bossIds}, #{sellCardIds}, #{fameCardIds}, #{itemInfo}, #{createTime}, #{endTime}, #{remark}) 
         ]]>
 </insert>
 
@@ -106,6 +112,8 @@
                        type = #{type},
                        status = #{status},
                        sessionid = #{sessionId},
+                       servername = #{serverName},
+                       ipaddress = #{ipAddress},
                        vip = #{vip},
                        name = #{name},
                        userid = #{userId},
@@ -123,8 +131,15 @@
                        sellCardIds = #{sellCardIds},
                        fameCardIds = #{fameCardIds},
                        itemInfo = #{itemInfo},
-                       endtime = #{endTime},
                        remark = #{remark}
+             WHERE ID = #{id}
+        ]]>
+</update>
+
+<update id="mar_updateMarzAccountEndTime" parameterType="MarzAccountEvt">
+        <![CDATA[  
+            UPDATE t_tgks_mar_marzaccount SET 
+                       endtime = #{endTime}
              WHERE ID = #{id}
         ]]>
 </update>

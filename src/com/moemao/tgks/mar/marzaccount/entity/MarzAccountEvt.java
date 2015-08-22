@@ -52,6 +52,10 @@ private String status;
  */
 private String sessionId;
 
+private String serverName;
+
+private String ipAddress;
+
 /**
  * VIP等级（0 试用；1 普通；2 白金；3 钻石）
  */
@@ -564,6 +568,26 @@ public List<ItemEvt> getItemList()
 public void setItemList(List<ItemEvt> itemList)
 {
     this.itemList = itemList;
+}
+
+public String getServerName()
+{
+    return serverName;
+}
+
+public void setServerName(String serverName)
+{
+    this.serverName = serverName;
+}
+
+public String getIpAddress()
+{
+    return ipAddress;
+}
+
+public void setIpAddress(String ipAddress)
+{
+    this.ipAddress = ipAddress;
 }
 
 }

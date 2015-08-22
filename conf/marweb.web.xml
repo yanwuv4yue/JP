@@ -8,6 +8,12 @@
     <action name="login" class="com.moemao.tgks.marweb.login.action.LoginAction" method="login">
         <result name="success">/WEB-INF/jsp/marweb/main/index.jsp</result>
         <result name="error">/marweb/index.jsp</result>
+        <result name="login" type="redirect">http://${ipAddress}:48080/tgks/marweb/loginChanged?userId=${userId}</result>
+    </action>
+    
+    <action name="loginChanged" class="com.moemao.tgks.marweb.login.action.LoginAction" method="loginChanged">
+        <result name="success">/WEB-INF/jsp/marweb/main/index.jsp</result>
+        <result name="error">/marweb/index.jsp</result>
     </action>
     
     <action name="register" class="com.moemao.tgks.marweb.login.action.LoginAction" method="register">

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+  "-//mybatis.org//DTD Mapper 3.0//EN" 
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.moemao.tgks.mar.marzserver.dao.MarzServerDao">
+    <resultMap id="MarzServerEvtMap" type="MarzServerEvt">
+        <id property="id" column="ID" />
+        <result property="serverName" column="SERVERNAME" />
+        <result property="userNum" column="USERNUM" />
+        <result property="status" column="STATUS" />
+        <result property="accept" column="ACCEPT" />
+        <result property="loaclIp" column="LOACLIP" />
+        <result property="netIp" column="NETIP" />
+    </resultMap>
+</mapper>

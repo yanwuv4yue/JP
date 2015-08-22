@@ -1,11 +1,11 @@
 package com.moemao.tgks.mar.marz.thread;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,6 +18,7 @@ import com.moemao.tgks.mar.marz.task.MarzTaskDiffusion;
 import com.moemao.tgks.mar.marz.tool.MarzConstant;
 import com.moemao.tgks.mar.marzaccount.entity.MarzAccountEvt;
 import com.moemao.tgks.mar.marzaccount.service.MarzAccountService;
+import com.moemao.tgks.mar.marzserver.service.MarzServerService;
 import com.moemao.tgks.mar.tool.MarConstant;
 
 /**
@@ -35,7 +36,11 @@ import com.moemao.tgks.mar.tool.MarConstant;
  */
 public class MarzThreadPoolDiffusion implements Runnable, ApplicationContextAware
 {
-    private MarzThreadPoolDiffusion() {}
+    private MarzThreadPoolDiffusion()
+    {
+        marzAccountService = (MarzAccountService) ContextUtil.getBean("mar_marzAccountService");
+        marzServerService = (MarzServerService) ContextUtil.getBean("mar_marzServerService");
+    }
     
     private static MarzThreadPoolDiffusion instance;
     
@@ -52,6 +57,8 @@ public class MarzThreadPoolDiffusion implements Runnable, ApplicationContextAwar
     private ExecutorService executor = null;
     
     private MarzAccountService marzAccountService;
+    
+    private MarzServerService marzServerService;
     
     private boolean bRunning = true;
     
@@ -71,8 +78,6 @@ public class MarzThreadPoolDiffusion implements Runnable, ApplicationContextAwar
     {
         bRunning = true;
         
-        marzAccountService = (MarzAccountService) ContextUtil.getBean("mar_marzAccountService");
-        
         if (null == executor || executor.isTerminated())
         {
             executor = Executors.newFixedThreadPool(defaultThreadNum);
@@ -84,21 +89,31 @@ public class MarzThreadPoolDiffusion implements Runnable, ApplicationContextAwar
             // 存在当前线程池
         }
         
-        // 从数据库中查询出需要执行的任务
-        accountList = marzAccountService.queryMarzAccountOnline();
-        
-        System.out.println("取出需要执行的任务数：" + accountList.size());
-        
         try
         {
+            // 获取本机IP
+            String ip = InetAddress.getLocalHost().getHostAddress().toString();
+            
+            // 修改服务器表状态
+            marzServerService.changeMarzServerStatus(ip, MarzConstant.MARZSERVER_STATUS_1);
+            
+            // 从数据库中查询出需要执行的任务
+            accountList = marzAccountService.queryMarzAccountOnline(ip);
+            
+            System.out.println("取出需要执行的任务数：" + accountList.size());
+            
             // 循环建立新的任务 放入线程池执行
             for (MarzAccountEvt account : accountList)
             {
-                account.setSessionId("");
-                marzAccountService.updateMarzAccount(account);
-                executor.execute(new MarzTaskDiffusion(account));
-                
-                Thread.sleep(singleTime);
+                // update by ken 20150821 for 负载均衡加上后 启动服务器时只拉起本机上运行的线程
+                if (ip.equals(account.getIpAddress()))
+                {
+                    account.setSessionId("");
+                    marzAccountService.updateMarzAccount(account);
+                    executor.execute(new MarzTaskDiffusion(account));
+                    
+                    Thread.sleep(singleTime);
+                }
             }
             
             while (bRunning)
@@ -108,12 +123,19 @@ public class MarzThreadPoolDiffusion implements Runnable, ApplicationContextAwar
                 // 定时销毁已经释放了的线程
                 this.destoryOverThread();
                 
+                marzServerService.updateMarzServerUserNum(ip, this.getMarzThreadNum());
+                
                 Thread.sleep(mainThreadSleep);
             }
         }
         catch (InterruptedException e)
         {
             System.out.println("出问题了！我不行了！" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        }
+        catch (UnknownHostException e)
+        {
+            e.printStackTrace();
+            System.out.println("服务器IP获取异常！" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         }
     }
     
@@ -234,28 +256,51 @@ public class MarzThreadPoolDiffusion implements Runnable, ApplicationContextAwar
     @SuppressWarnings("deprecation")
     public void shutdown()
     {
-        // 关闭线程
-        executor.shutdown();
-        
-        threadGroup = Thread.currentThread().getThreadGroup();
-        threads = new Thread[threadGroup.activeCount()];
-        threadGroup.enumerate(threads);
-        
-        for (Thread thread : threads)
+        // 更新服务器状态
+        try
         {
-            if (thread != null && thread.getName().contains(MarConstant.MODULE_TAG))
+            // 获取本机IP
+            String ip = InetAddress.getLocalHost().getHostAddress().toString();
+            
+            // 修改服务器表状态
+            marzServerService.changeMarzServerStatus(ip, MarzConstant.MARZSERVER_STATUS_0);
+        }
+        catch (UnknownHostException e)
+        {
+            e.printStackTrace();
+        }
+        
+        if (null == executor || executor.isTerminated())
+        {
+            
+        }
+        else
+        {
+            // 存在当前线程池
+            // 关闭线程
+            executor.shutdown();
+            
+            threadGroup = Thread.currentThread().getThreadGroup();
+            threads = new Thread[threadGroup.activeCount()];
+            threadGroup.enumerate(threads);
+            
+            for (Thread thread : threads)
             {
-                try
+                if (thread != null && thread.getName().contains(MarConstant.MODULE_TAG))
                 {
-                    thread.stop();
-                    System.out.println("关闭线程..." + thread.getName());
-                }
-                catch (Throwable t)
-                {
-                    
+                    try
+                    {
+                        thread.stop();
+                        System.out.println("关闭线程..." + thread.getName());
+                    }
+                    catch (Throwable t)
+                    {
+                        
+                    }
                 }
             }
         }
+        
         System.out.println("线程池已经关闭...");
     }
     
@@ -325,11 +370,21 @@ public class MarzThreadPoolDiffusion implements Runnable, ApplicationContextAwar
 
     public static void main(String[] args)
     {
-        String str = "123456";
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("abc", str);
-        str = null;
-        System.out.println(str);
-        System.out.println(map.get("abc"));
+        InetAddress addr;
+        try
+        {
+            addr = InetAddress.getLocalHost();
+            String ip=addr.getHostAddress().toString();
+            System.out.println(ip);
+            
+            InetAddress[]   inetAdds   =   InetAddress.getAllByName(InetAddress.getLocalHost().getHostName()); 
+            for(int i = 0 ; i < inetAdds.length; i++){
+                System.out.print(inetAdds[i].getHostName()+ ":\t");
+                System.out.println(inetAdds[i].getHostAddress());
+            }
+        }
+        catch (UnknownHostException e)
+        {
+        }
     }
 }

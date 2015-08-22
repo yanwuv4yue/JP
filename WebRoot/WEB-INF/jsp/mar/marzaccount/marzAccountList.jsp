@@ -11,6 +11,7 @@
                 <th>类型</th>
                 <th>VIP</th>
                 <th>状态</th>
+                <th>服务器</th>
                 <th>角色名</th>
                 <th>等级</th>
                 <th>AP</th>
@@ -41,6 +42,7 @@
                         <s:if test="#evt.status == 0">离线</s:if>
                         <s:elseif test="#evt.status == 1">在线</s:elseif>
                     </td>
+                    <td><s:property value='#evt.serverName'/></td>
                     <td><s:property value='#evt.name'/></td>
                     <td><s:property value='#evt.lv'/></td>
                     <td><s:property value='#evt.ap'/>/<s:property value='#evt.apMax'/></td>

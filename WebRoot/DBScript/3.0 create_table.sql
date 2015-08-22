@@ -75,6 +75,8 @@ CREATE TABLE IF NOT EXISTS `t_tgks_mar_marzaccount` (
   `type` varchar(3) NOT NULL COMMENT '类型（0 IOS；1 Android）',
   `status` varchar(3) NOT NULL COMMENT '状态（0 离线；1 在线）',
   `sessionid` varchar(30) default NULL COMMENT 'SessionId',
+  `servername` varchar(30) default NULL COMMENT '服务器名称',
+  `ipaddress` varchar(30) default NULL COMMENT '服务器IP',
   `vip` varchar(3) NOT NULL COMMENT 'VIP等级（0 试用；1 普通；2 白金；3 钻石）',
   `name` varchar(100) default NULL COMMENT '角色名',
   `userid` varchar(30) default NULL COMMENT 'USER ID',
@@ -171,3 +173,18 @@ CREATE TABLE IF NOT EXISTS `t_tgks_mar_marzitem` (
   `param` varchar(100) default NULL COMMENT '参数（多个参数时用|分割）',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='挂机物品表';
+
+--
+-- 表的结构 `t_tgks_mar_marzserver`
+--
+DROP TABLE IF EXISTS `t_tgks_mar_marzserver`;
+CREATE TABLE IF NOT EXISTS `t_tgks_mar_marzserver` (
+  `id` varchar(30) NOT NULL COMMENT '表唯一主键',
+  `serverName` varchar(30) NOT NULL COMMENT '服务器名称',
+  `userNum` int(3) NOT NULL default '0' COMMENT '用户数量',
+  `status` varchar(3) NOT NULL COMMENT '状态（0 已停止；1 运行中）',
+  `accept` varchar(3) NOT NULL COMMENT '是否分流（0 禁止分流；1 允许分流）',
+  `loaclIp` varchar(30) NOT NULL COMMENT '本地IP',
+  `netIp` varchar(30) NOT NULL COMMENT '外网IP',
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='挂机服务器表';

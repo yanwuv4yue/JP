@@ -269,7 +269,7 @@ public class MarzCardAction extends TGKSAction
                     gc.add(cardType, plusNum);
                 }
                 account.setEndTime(gc.getTime());
-                this.mar_marzAccountService.updateMarzAccount(account);
+                this.mar_marzAccountService.updateMarzAccountEndTime(account);
                 
                 // 保存日志 充值记录 type=9
                 this.mar_marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_9, "充值成功 类型：" + cardTypeStr + " 卡号：" + marzCardEvt.getPassword());

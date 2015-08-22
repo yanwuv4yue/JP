@@ -39,5 +39,9 @@
 		<!-- mar_﻿marzitem -->
 		<typeAlias alias="MarzItemEvt" type="com.moemao.tgks.mar.marzitem.entity.MarzItemEvt" />
 		<typeAlias alias="MarzItemReq" type="com.moemao.tgks.mar.marzitem.entity.MarzItemReq" />
+		
+		<!-- mar_﻿marzserver -->
+		<typeAlias alias="MarzServerEvt" type="com.moemao.tgks.mar.marzserver.entity.MarzServerEvt" />
+		<typeAlias alias="MarzServerReq" type="com.moemao.tgks.mar.marzserver.entity.MarzServerReq" />
 	</typeAliases>
 </configuration>
