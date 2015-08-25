@@ -32,8 +32,8 @@
 		        <s:if test="marzAccountEvt.vip == 2">白金</s:if>
 		        <s:if test="marzAccountEvt.vip == 3">钻石</s:if>
 	        </td>
-	        <td><!-- 角色ID --></td>
-	        <td><!-- ${marzAccountEvt.userId } --></td>
+	        <td>服务器</td>
+	        <td>${marzAccountEvt.serverName }</td>
 	    </tr>
 	    <tr>
 	        <td>AP</td>

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
+import net.sf.json.JSONObject;
+
 public class HttpRequest
 {
     private static int SLEEP_TIME = 4000;
@@ -204,5 +206,27 @@ public class HttpRequest
         }
         
         return result;
+    }
+    
+    public static void main(String[] args) throws Exception
+    {
+        HttpRequest request = new HttpRequest();
+        String result = "";
+        result = request.sendPost("https://game.fate-go.jp/account/regist", "appVer=1.0.3&lastAccessTime=1439485819&dataVer=20");
+        System.out.println(result);
+        JSONObject resCode= JSONObject.fromObject(result);
+        String userId = JSONObject.fromObject(resCode.getJSONArray("response").get(0)).getJSONObject("success").getString("userId");
+        String authKey = JSONObject.fromObject(resCode.getJSONArray("response").get(0)).getJSONObject("success").getString("authKey");
+        String secretKey = JSONObject.fromObject(resCode.getJSONArray("response").get(0)).getJSONObject("success").getString("secretKey");
+        System.out.println(userId + "|" + trans(authKey));
+        result = request.sendPost("http://game.fate-go.jp/gamedata/top?_userId="+userId, "userId="+userId+"&authKey="+trans(authKey)+"&appVer=1.0.3&lastAccessTime=1439485822&dataVer=20");
+        System.out.println(result);
+        result = request.sendPost("https://game.fate-go.jp/login/top?_userId="+userId, "userId="+userId+"&authKey="+trans(authKey)+"&appVer=1.0.3&lastAccessTime=1439485863&dataVer=20");
+        System.out.println(result);
+    }
+    
+    public static String trans(String str)
+    {
+        return str.replaceAll("=", "%3d").replaceAll(":", "%3a");
     }
 }

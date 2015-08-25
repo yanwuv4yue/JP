@@ -128,7 +128,8 @@ public class LoginAction extends TGKSAction
                 }
                 else
                 {
-                    ipAddress = marzServerEvt.getLoaclIp();
+                    // 本机IP相同 但是用户需要用外网IP访问
+                    ipAddress = marzServerEvt.getNetIp();
                 }
             }
             catch (UnknownHostException e)

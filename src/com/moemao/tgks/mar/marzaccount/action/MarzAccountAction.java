@@ -169,17 +169,22 @@ public class MarzAccountAction extends TGKSAction
             // add by ken 20150821 for 负载均衡后添加服务器名称以及IP地址
             try
             {
+                // 根据服务器内网IP查找服务器信息
                 String ip = InetAddress.getLocalHost().getHostAddress().toString();
                 MarzServerEvt marzServerEvt = mar_marzServerService.queryMarzServerByLoaclIp(ip);
                 if (CommonUtil.isEmpty(marzServerEvt))
                 {
                     marzAccountEvt.setServerName("unknowServer");
-                    marzAccountEvt.setIpAddress("unknowIp");
+                    marzAccountEvt.setIpAddress("");
+                    marzAccountEvt.setRemark("挂机服务器异常！请联系管理员！");
+                    MarzThreadPoolDiffusion.getInstance().stopThread(MarConstant.MODULE_TAG + marzAccountEvt.getTgksId());
+                    return SUCCESS;
                 }
                 else
                 {
                     marzAccountEvt.setServerName(marzServerEvt.getServerName());
-                    marzAccountEvt.setIpAddress(marzServerEvt.getLoaclIp());
+                    // 然后把服务器外网IP放到账号信息中
+                    marzAccountEvt.setIpAddress(marzServerEvt.getNetIp());
                 }
             }
             catch (UnknownHostException e)
@@ -292,12 +297,12 @@ public class MarzAccountAction extends TGKSAction
                         if (CommonUtil.isEmpty(marzServerEvt))
                         {
                             acc.setServerName("unknowServer");
-                            acc.setIpAddress("unknowIp");
+                            acc.setIpAddress("");
                         }
                         else
                         {
                             acc.setServerName(marzServerEvt.getServerName());
-                            acc.setIpAddress(marzServerEvt.getLoaclIp());
+                            acc.setIpAddress(marzServerEvt.getNetIp());
                         }
                     }
                     catch (UnknownHostException e)

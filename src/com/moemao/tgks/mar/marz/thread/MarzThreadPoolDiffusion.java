@@ -18,6 +18,7 @@ import com.moemao.tgks.mar.marz.task.MarzTaskDiffusion;
 import com.moemao.tgks.mar.marz.tool.MarzConstant;
 import com.moemao.tgks.mar.marzaccount.entity.MarzAccountEvt;
 import com.moemao.tgks.mar.marzaccount.service.MarzAccountService;
+import com.moemao.tgks.mar.marzserver.entity.MarzServerEvt;
 import com.moemao.tgks.mar.marzserver.service.MarzServerService;
 import com.moemao.tgks.mar.tool.MarConstant;
 
@@ -93,12 +94,14 @@ public class MarzThreadPoolDiffusion implements Runnable, ApplicationContextAwar
         {
             // 获取本机IP
             String ip = InetAddress.getLocalHost().getHostAddress().toString();
+            // 通过本机IP获取外网IP
+            MarzServerEvt marzServerEvt = marzServerService.queryMarzServerByLoaclIp(ip);
             
             // 修改服务器表状态
             marzServerService.changeMarzServerStatus(ip, MarzConstant.MARZSERVER_STATUS_1);
             
-            // 从数据库中查询出需要执行的任务
-            accountList = marzAccountService.queryMarzAccountOnline(ip);
+            // 从数据库中查询出需要执行的任务 账号信息表中存放的是外网IP
+            accountList = marzAccountService.queryMarzAccountOnline(marzServerEvt.getNetIp());
             
             System.out.println("取出需要执行的任务数：" + accountList.size());
             
