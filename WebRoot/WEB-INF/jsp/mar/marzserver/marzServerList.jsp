@@ -16,7 +16,7 @@
         </thead>
         <tbody>
 			<s:iterator  value="list" var="evt">
-				<tr>
+				<tr <s:if test="#evt.status == 0 || #evt.accept == 0">style="background-color: #ddd"</s:if>>
 					<td width="20"><input type="checkbox" name="marzServerId" value="<s:property value='#evt.id'/>" /></td>
 					<td><b id="<s:property value='#evt.id'/>" class="marzServerUpdate"><s:property value="#evt.serverName"/></b></td>
 					<td><s:property value="#evt.userNum"/></td>

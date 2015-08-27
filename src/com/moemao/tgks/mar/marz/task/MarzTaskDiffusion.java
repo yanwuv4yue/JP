@@ -315,6 +315,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         account.setFp(0);
         account.setGold(0);
         account.setSessionId("");
+        account.setIpAddress("");
         account.setRemark("");
         this.marzAccountService.updateMarzAccount(account);
     }
