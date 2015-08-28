@@ -30,6 +30,19 @@
                         <option value="1">在线</option>
                     </select>
                 </td>
+                <td>服务器: </td>
+                <td>
+                    <select name="marzAccountReq.serverName">
+                        <option value="">全部</option>
+                        <s:iterator  value="allServerList" var="evt">
+                            <option value="<s:property value='#evt.serverName'/>"><s:property value="#evt.serverName"/></option>
+                        </s:iterator>
+                    </select>
+                </td>
+			</tr>
+			<tr>
+                <td>未过期: </td>
+                <td><input type="text" class="datepicker" name="marzAccountReq.endTime" /></td>
                 <td><label>VIP: </label></td>
                 <td>
                     <select name="marzAccountReq.vip">
@@ -40,12 +53,6 @@
                         <option value="3">钻石</option>
                     </select>
                 </td>
-			</tr>
-			<tr>
-                <td>未过期: </td>
-                <td><input type="text" class="datepicker" name="marzAccountReq.endTime" /></td>
-                <td></td>
-                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
