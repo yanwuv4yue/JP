@@ -346,6 +346,46 @@ public class MarzRequest
         return map;
     }
     
+    public Map<String, JSONObject> presentBoxShow(String sid) throws Exception
+    {
+        map = new HashMap<String, JSONObject>();
+        
+        String paramStr = sid + "=";
+        String[] result = httpRequest.sendPost(MarConstant.URL_PRESENTBOXSHOW, paramStr).split(MarConstant.KRSMA_SPLIT);
+        System.out.println(MarzConstant.LOG_SYSTEM_INFO + "presentBoxShow " + Thread.currentThread().getName());
+        
+        JSONObject resCode= JSONObject.fromObject(result[1].substring(0, result[1].indexOf("}{") + 1));
+        JSONObject presentBoxShow = JSONObject.fromObject(result[1].substring(result[1].indexOf("}{") + 1, result[1].length()));
+        
+        map.put(MarzConstant.JSON_TAG_SID, this.sidJSONObject(result[0]));
+        map.put(MarzConstant.JSON_TAG_RESCODE, resCode);
+        map.put(MarzConstant.JSON_TAG_PRESENTBOXSHOW, presentBoxShow);
+
+        result = null;
+        resCode = null;
+        return map;
+    }
+    
+    public Map<String, JSONObject> presentBoxRecv(String sid, String presentId) throws Exception
+    {
+        map = new HashMap<String, JSONObject>();
+        
+        String paramStr = sid + "={\"presentid\":" + presentId + "}";
+        String[] result = httpRequest.sendPost(MarConstant.URL_PRESENTBOXRECV, paramStr).split(MarConstant.KRSMA_SPLIT);
+        System.out.println(MarzConstant.LOG_SYSTEM_INFO + "presentBoxRecv " + Thread.currentThread().getName());
+        
+        JSONObject resCode= JSONObject.fromObject(result[1].substring(0, result[1].indexOf("}{") + 1));
+        JSONObject presentBoxRecv = JSONObject.fromObject(result[1].substring(result[1].indexOf("}{") + 1, result[1].length()));
+        
+        map.put(MarzConstant.JSON_TAG_SID, this.sidJSONObject(result[0]));
+        map.put(MarzConstant.JSON_TAG_RESCODE, resCode);
+        map.put(MarzConstant.JSON_TAG_PRESENTBOXRECV, presentBoxRecv);
+
+        result = null;
+        resCode = null;
+        return map;
+    }
+    
     public Map<String, JSONObject> presentBoxMultiRecv(String sid) throws Exception
     {
         map = new HashMap<String, JSONObject>();

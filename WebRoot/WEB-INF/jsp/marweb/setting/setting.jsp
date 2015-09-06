@@ -85,7 +85,13 @@
                         </s:iterator>
                     </select>
                 </td>
-                <td></td><td></td>
+                <td>收限时礼物</td>
+                <td>
+                    <select id="marzSettingEvt.autoPresentRecv" name="marzSettingEvt.autoPresentRecv">
+                         <option value="0">关</option>
+                         <option value="1" <s:if test="marzSettingEvt.autoPresentRecv == 1">selected="selected"</s:if>>开</option>
+                    </select>
+                </td>
                 <td></td><td></td>
             </tr>
             <tr>

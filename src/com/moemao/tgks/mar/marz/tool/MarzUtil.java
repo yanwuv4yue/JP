@@ -1,6 +1,8 @@
 package com.moemao.tgks.mar.marz.tool;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.moemao.tgks.common.tool.CommonUtil;
@@ -100,5 +102,21 @@ public class MarzUtil
         }
         
         return sb.toString();
+    }
+    
+    /**
+     * 
+     * @Title: inFreeTime
+     * @Description: 空闲时间 0点~12点
+     * @return
+     * @return boolean 返回类型
+     * @throws
+     */
+    public static boolean inFreeTime()
+    {
+        Date now = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("HH");
+        int hour = Integer.parseInt(sdf.format(now));
+        return 0 <= hour && hour <= 12;
     }
 }

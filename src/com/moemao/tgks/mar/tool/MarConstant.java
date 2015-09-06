@@ -157,7 +157,17 @@ public class MarConstant
      * 输入招待号
      */
     public static final String URL_INVITECODEENTER = URL_PRE + "/Game/InviteCodeEnter";
-
+    
+    /**
+     * 礼物箱信息
+     */
+    public static final String URL_PRESENTBOXSHOW = URL_PRE + "/Game/PresentBoxShow";
+    
+    /**
+     * 单个礼物收取
+     */
+    public static final String URL_PRESENTBOXRECV = URL_PRE + "/Game/PresentBoxRecv";
+    
     /**
      * 批量收取礼物
      */

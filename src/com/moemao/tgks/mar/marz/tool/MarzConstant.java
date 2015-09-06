@@ -52,6 +52,8 @@ public class MarzConstant
     public static final String JSON_TAG_ITEMSHOPBUY = "itemShopBuy";
     public static final String JSON_TAG_CARDFUSION = "cardFusion";
     public static final String JSON_TAG_CARDSELL = "cardSell";
+    public static final String JSON_TAG_PRESENTBOXSHOW = "presentBoxShow";
+    public static final String JSON_TAG_PRESENTBOXRECV= "presentBoxRecv";
     public static final String JSON_TAG_PRESENTBOXMULTIRECV = "presentBoxMultiRecv";
     public static final String JSON_TAG_TEAMBATTLESOLOSHOW = "teamBattleSoloShow";
     public static final String JSON_TAG_TEAMBATTLESOLOSTART = "teamBattleSoloStart";
@@ -83,6 +85,7 @@ public class MarzConstant
     public static final int VALIDATE_SETTING_CARDSELL_EVO = 17; // 进化素材出售开关
     public static final int VALIDATE_SETTING_CARDSELL_EVONUM = 18; // 进化素材保留数量
     public static final int VALIDATE_SETTING_BATTLE_LEVEL_UP = 19; // 进化素材保留数量
+    public static final int VALIDATE_SETTING_AUTOPRESENTRECV = 20; // 收取带有期限的物品
     
     /**
      * MARZACCOUNT 账号类型 0 IOS

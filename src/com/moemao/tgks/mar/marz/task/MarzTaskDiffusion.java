@@ -29,6 +29,7 @@ import com.moemao.tgks.mar.marz.entity.CardTagEvt;
 import com.moemao.tgks.mar.marz.entity.DeckEvt;
 import com.moemao.tgks.mar.marz.entity.ItemEvt;
 import com.moemao.tgks.mar.marz.entity.MissionEvt;
+import com.moemao.tgks.mar.marz.entity.PresentEvt;
 import com.moemao.tgks.mar.marz.thread.MarzThreadPoolDiffusion;
 import com.moemao.tgks.mar.marz.tool.MarzConstant;
 import com.moemao.tgks.mar.marz.tool.MarzDataPool;
@@ -47,6 +48,8 @@ import com.moemao.tgks.mar.tool.MarConstant;
 
 public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
 {
+    public boolean running = true;
+    
     private static Log logger = LogFactory.getLog(MarzTaskDiffusion.class);
     
     private MarzRequest request = MarzRequest.getInstance();
@@ -80,9 +83,9 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     
     private Map<String, String> pvpEndMap;
     
-    public boolean running = true;
+    private boolean itemUseFlag = false;
     
-    boolean itemUseFlag = false;
+    private String arthurType = "3";
     
     public MarzTaskDiffusion(MarzAccountEvt marzAccountEvt)
     {
@@ -410,6 +413,10 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 {
                     marzSettingEvt.setBattleLevelUp(setting.getValue());
                 }
+                else if (MarzConstant.VALIDATE_SETTING_AUTOPRESENTRECV == Integer.parseInt(setting.getName()))
+                {
+                    marzSettingEvt.setAutoPresentRecv(setting.getValue());
+                }
             }
         }
     }
@@ -519,6 +526,54 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     {
         try
         {
+            // 匹配物品信息
+            MarzItemReq marzItemReq = new MarzItemReq();
+            List<MarzItemEvt> marzItemList = this.marzItemService.queryMarzItem(marzItemReq);
+            
+            // add by ken 20150907 for presentRecv time limit
+            if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOPRESENTRECV) && MarzUtil.inFreeTime())
+            {
+                map = request.presentBoxShow(sid);
+                
+                resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                
+                List<PresentEvt> presentList = new ArrayList<PresentEvt>();
+                
+                if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                {
+                    sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                    
+                    JSONObject presentBoxShow = map.get(MarzConstant.JSON_TAG_PRESENTBOXSHOW);
+                    JSONArray presents = presentBoxShow.getJSONArray("presents");
+                    JSONObject presentJSON;
+                    
+                    for (int i = 0, size = presents.size(); i < size; i++)
+                    {
+                        presentJSON = JSONObject.fromObject(presents.get(i));
+                        presentList.add(new PresentEvt(presentJSON));
+                    }
+                    
+                    // 取出有时间限制的礼物
+                    for (PresentEvt present : presentList)
+                    {
+                        // 仅对有时间限制的道具进行取出
+                        if (present.getLimit_tm() > 0)
+                        {
+                            map = request.presentBoxRecv(sid, present.getPresentid());
+                            
+                            resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                            
+                            if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                            {
+                                sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                                
+                                this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "收取礼物成功！" + present.getComment());
+                            }
+                        }
+                    }
+                }
+            }
+            
             map = request.itemShow(sid);
             
             resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
@@ -528,10 +583,6 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
             {
                 sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                
-                // 匹配物品信息
-                MarzItemReq marzItemReq = new MarzItemReq();
-                List<MarzItemEvt> marzItemList = this.marzItemService.queryMarzItem(marzItemReq);
                 
                 JSONObject itemShow = map.get(MarzConstant.JSON_TAG_ITEMSHOW);
                 JSONArray items = itemShow.getJSONArray("items");
@@ -558,7 +609,9 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     itemUseFlag = false;
                     for (ItemEvt item : itemList)
                     {
-                        if (item.getItemId().equals(marzSettingEvt.getAutoUseBPPotionItemId()))
+                        // update by ken 20150907 for change id to id1,id2
+                        //if (item.getItemId().equals(marzSettingEvt.getAutoUseBPPotionItemId()))
+                        if (marzSettingEvt.getAutoUseBPPotionItemId().contains(item.getItemId()))
                         {
                             bpNum = item.getNum();
                             break;
@@ -686,8 +739,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         
         try
         {
-            // 接口设计的是可以根据职业来做 不过这个没啥意义 就写死了
-            request.exploreStart(sid, "1", "0");
+            // 接口设计的是可以根据职业来做 不过这个没啥意义 就写死了 | 纪念妹妹又活啦！
+            request.exploreStart(sid, this.arthurType, "0");
             
             map = request.exploreEnd(sid);
             
@@ -1364,7 +1417,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 JSONObject groupJSON;
                 JSONArray bossArray;
                 JSONObject bossJSON;
-                String arthurType = "3";
+                
                 String arthur1 = "";
                 String arthur2 = "";
                 String arthur3 = "";
@@ -1579,7 +1632,9 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     {
                         for (BossEvt m : battleMapList)
                         {
-                            if (id.equals(m.getBossId()) && account.getBpMax() >= m.getBpCost())
+                            //if (id.equals(m.getBossId()) && account.getBpMax() >= m.getBpCost())
+                            // update by ken 20150907 for battle id to id1-id2-id3
+                            if (id.contains(m.getBossId()) && account.getBpMax() >= m.getBpCost())
                             {
                                 bossEvt = m;
                                 MarzMapEvt map = MarzDataPool.getInstance().getMarzMapByBossId(m.getBossId());
@@ -1647,7 +1702,9 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         {
                             for (BossEvt m : battleMapList)
                             {
-                                if (marzSettingEvt.getBattleNowasteBossId().equals(m.getBossId()) && account.getBp() >= m.getBpCost())
+                                //if (marzSettingEvt.getBattleNowasteBossId().equals(m.getBossId()) && account.getBp() >= m.getBpCost())
+                                // update by ken 20150907 for battle id to id1-id2-id3
+                                if (marzSettingEvt.getBattleNowasteBossId().contains(m.getBossId()) && account.getBp() >= m.getBpCost())
                                 {
                                     bossEvt = m;
                                 }
@@ -1834,6 +1891,12 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     
     private int pvp()
     {
+        // add by ken 20150907 for pvp time limit
+        if (!MarzUtil.inFreeTime())
+        {
+            return MarzConstant.SUCCESS;
+        }
+        
         if (!validateSetting(MarzConstant.VALIDATE_SETTING_PVP))
         {
             return MarzConstant.SUCCESS;
@@ -1885,36 +1948,53 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     }
                     
                     // 这里选出PVP的主职业
-                    String arthur_type = "1";
+                    String arthurPvpType = "1";
                     boolean freePVP = false;
                     for (MissionEvt m : missionList)
                     {
                         if ("2003001".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
-                            arthur_type = "1";
+                            arthurPvpType = "1";
                         }
                         else if ("2003002".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
-                            arthur_type = "2";
+                            arthurPvpType = "2";
                         }
                         else if ("2003003".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
-                            arthur_type = "3";
+                            arthurPvpType = "3";
                         }
                         else if ("2003004".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
-                            arthur_type = "4";
+                            arthurPvpType = "4";
                         }
                         else if ("2004001".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
                             freePVP = true;
+                        }
+                        // add by ken 20150907 for quest select job
+                        else if("2001001".equals(m.getMissionid()))
+                        {
+                            this.arthurType = "1";
+                        }
+                        else if("2001002".equals(m.getMissionid()))
+                        {
+                            this.arthurType = "2";
+                        }
+                        else if("2001003".equals(m.getMissionid()))
+                        {
+                            this.arthurType = "3";
+                        }
+                        else if("2001004".equals(m.getMissionid()))
+                        {
+                            this.arthurType = "4";
                         }
                     }
                     
                     // 防止PVP经常少一场
                     if (freePVP)
                     {
-                        map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_0, arthur_type, deckMap);
+                        map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_0, arthurPvpType, deckMap);
                         resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                         
                         if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
@@ -1924,7 +2004,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             JSONObject pvpStart = map.get(MarzConstant.JSON_TAG_PVPSTART);
                             String btluid = pvpStart.getString("btluid");
                             Thread.sleep(MarzConstant.SLEEPTIME_BATTLE_SOLO);
-                            map = this.request.pvpEnd(sid, btluid, pvpEndMap.get(arthur_type));
+                            map = this.request.pvpEnd(sid, btluid, pvpEndMap.get(arthurPvpType));
                             resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                             
                             if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
@@ -1934,7 +2014,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         }
                     }
                     
-                    map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_1, arthur_type, deckMap);
+                    map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_1, arthurPvpType, deckMap);
                     resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                     
                     if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
@@ -1950,7 +2030,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         
                         Thread.sleep(MarzConstant.SLEEPTIME_BATTLE_SOLO);
                         
-                        map = this.request.pvpEnd(sid, btluid, pvpEndMap.get(arthur_type));
+                        map = this.request.pvpEnd(sid, btluid, pvpEndMap.get(arthurPvpType));
                         resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                         
                         if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
@@ -2048,6 +2128,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getCardSellEvo());
             case MarzConstant.VALIDATE_SETTING_BATTLE_LEVEL_UP: // 练级模式
                 return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getBattleLevelUp());
+            case MarzConstant.VALIDATE_SETTING_AUTOPRESENTRECV: // 自动拿出带期限的礼物
+                return MarzConstant.MARZSETTING_ON.equals(marzSettingEvt.getAutoPresentRecv());
             default:
                 return false;
         }

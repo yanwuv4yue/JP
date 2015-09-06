@@ -65,6 +65,8 @@ private String cardSellEvoNum;
 
 private String battleLevelUp;
 
+private String autoPresentRecv;
+
 
 private String bossIds;
 
@@ -376,6 +378,16 @@ public String getBattleLevelUp()
 public void setBattleLevelUp(String battleLevelUp)
 {
     this.battleLevelUp = battleLevelUp;
+}
+
+public String getAutoPresentRecv()
+{
+    return autoPresentRecv;
+}
+
+public void setAutoPresentRecv(String autoPresentRecv)
+{
+    this.autoPresentRecv = autoPresentRecv;
 }
 
 }
