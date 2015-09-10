@@ -1973,19 +1973,19 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             freePVP = true;
                         }
                         // add by ken 20150907 for quest select job
-                        else if("2001001".equals(m.getMissionid()))
+                        else if("2001001".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
                             this.arthurType = "1";
                         }
-                        else if("2001002".equals(m.getMissionid()))
+                        else if("2001002".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
                             this.arthurType = "2";
                         }
-                        else if("2001003".equals(m.getMissionid()))
+                        else if("2001003".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
                             this.arthurType = "3";
                         }
-                        else if("2001004".equals(m.getMissionid()))
+                        else if("2001004".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
                             this.arthurType = "4";
                         }
