@@ -533,6 +533,57 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             // add by ken 20150907 for presentRecv time limit
             if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOPRESENTRECV) && MarzUtil.inFreeTime())
             {
+                // 先看看任务里面有没有可收取的
+                map = request.missionShow(sid);
+                resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                
+                if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                {
+                    sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                    
+                    // 处理报文整理为mission的List
+                    JSONObject missionShow = map.get(MarzConstant.JSON_TAG_MISSIONSHOW);
+                    JSONArray missions = missionShow.getJSONArray("missions");
+                    List<MissionEvt> missionList = new ArrayList<MissionEvt>();
+                    JSONObject missionJSON;
+                    
+                    for (int i = 0, size = missions.size(); i < size; i++)
+                    {
+                        missionJSON = JSONObject.fromObject(missions.get(i));
+                        missionList.add(new MissionEvt(missionJSON));
+                    }
+                    
+                    for (MissionEvt m : missionList)
+                    {
+                        // add by ken 20150907 for quest select job
+                        if("2001001".equals(m.getMissionid()) && "0".equals(m.getState()))
+                        {
+                            this.arthurType = "1";
+                        }
+                        else if("2001002".equals(m.getMissionid()) && "0".equals(m.getState()))
+                        {
+                            this.arthurType = "2";
+                        }
+                        else if("2001003".equals(m.getMissionid()) && "0".equals(m.getState()))
+                        {
+                            this.arthurType = "3";
+                        }
+                        else if("2001004".equals(m.getMissionid()) && "0".equals(m.getState()))
+                        {
+                            this.arthurType = "4";
+                        }
+                        
+                        // 这里过滤任务只做收取任务奖励使用
+                        if ("1".equals(m.getState()))
+                        {
+                            map = this.request.missionReward(sid, m.getMissionid());
+                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "收取任务奖励：" + m.getTitle());
+                        }
+                    }
+                }
+                
+                // 下面开始收礼物箱
                 map = request.presentBoxShow(sid);
                 
                 resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
@@ -1971,23 +2022,6 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         else if ("2004001".equals(m.getMissionid()) && "0".equals(m.getState()))
                         {
                             freePVP = true;
-                        }
-                        // add by ken 20150907 for quest select job
-                        else if("2001001".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            this.arthurType = "1";
-                        }
-                        else if("2001002".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            this.arthurType = "2";
-                        }
-                        else if("2001003".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            this.arthurType = "3";
-                        }
-                        else if("2001004".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            this.arthurType = "4";
                         }
                     }
                     
