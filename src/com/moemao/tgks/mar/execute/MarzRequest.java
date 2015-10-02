@@ -67,7 +67,7 @@ public class MarzRequest
         //String paramStr = "{\"uuid\":\"" + uuid + "\",\"clver\":\"2\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"samsung GT-N7100\",\"token\":\"\"}";
         //String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"3\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\"}";
         //String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"4\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
-        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"11\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
+        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"12\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
         
         String result = httpRequest.sendPost(MarConstant.URL_LOGIN, paramStr);
         System.out.println(MarzConstant.LOG_SYSTEM_INFO + "loginAndroid " + uuid + " " + Thread.currentThread().getName());
@@ -89,7 +89,7 @@ public class MarzRequest
         //String paramStr = "{\"uuid\":\"" + uuid + "\",\"clver\":\"2\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"samsung GT-N7100\",\"token\":\"\"}";
         //String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"3\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\"}";
         //String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"4\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
-        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"10\",\"os\":1,\"carrier\":1,\"market\":3,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
+        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + hashToken + "\",\"clver\":\"12\",\"os\":1,\"carrier\":1,\"market\":3,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
         
         String result = httpRequest.sendPost(MarConstant.URL_LOGIN, paramStr);
         System.out.println(MarzConstant.LOG_SYSTEM_INFO + "loginAndroidSE " + uuid + " " + Thread.currentThread().getName());
@@ -680,7 +680,7 @@ public class MarzRequest
         return result;
     }
     
-    public static void main(String[] args)
+    public static void main(String[] args) throws Exception
     {
         /*
         String str = "{xxx}{xxxxxxx}";
@@ -699,6 +699,17 @@ public class MarzRequest
             }
         }
         System.out.println(typeList.get(0)+typeList.get(1)+typeList.get(2));
+        */
+    	
+    	MarzRequest request = new MarzRequest();
+    	String androidUuid = "7027063d-7186-4dd0-a496-32b5c991acbd";
+        String androidToken = "JKft/CxeVmzYMbYlmF2aY/Q6iLc=";
+        System.out.println(request.loginAndroid(androidUuid, androidToken));
+        /*
+    	MarzRequest request = new MarzRequest();
+        String iosUuid = "920507d8-4987-4400-bcd0-6922091cee11";
+        String iosToken = "4ut9NO4FkxiXqOKRUtHXk7/bTYs=";
+        System.out.println(request.loginIOS(iosUuid, iosToken));
         */
     }
 }

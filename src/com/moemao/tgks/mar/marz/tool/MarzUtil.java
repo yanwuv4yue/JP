@@ -106,17 +106,17 @@ public class MarzUtil
     
     /**
      * 
-     * @Title: inFreeTime
-     * @Description: 空闲时间 0点~12点
+     * @Title: inPvpTime
+     * @Description: 时间 ①7:00～8:00　②13:00～14:00　③18:00～19:00　④22:00～23:00
      * @return
      * @return boolean 返回类型
      * @throws
      */
-    public static boolean inFreeTime()
+    public static boolean inPvpTime()
     {
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("HH");
         int hour = Integer.parseInt(sdf.format(now));
-        return 0 <= hour && hour <= 12;
+        return (hour == 7 || hour == 13 || hour == 18 || hour == 22);
     }
 }
