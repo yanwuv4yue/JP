@@ -81,8 +81,8 @@
 </div>
 <script type="text/javascript">
 $(document).ready(function(){
-	var table=$.ajax({url:"../mar/queryMarzAccount.action",async:false});
-	$("#marzAccountDiv").html(table.responseText);
+	//var table=$.ajax({url:"../mar/queryMarzAccount.action",async:false});
+	//$("#marzAccountDiv").html(table.responseText);
 	
 	function query()
 	{

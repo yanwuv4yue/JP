@@ -39,6 +39,12 @@
                         <s:elseif test="#evt.type == 5">
                             出售
                         </s:elseif>
+                        <s:elseif test="#evt.type == 6">
+                            PVP
+                        </s:elseif>
+                        <s:elseif test="#evt.type == 7">
+                            抽卡
+                        </s:elseif>
                         <s:elseif test="#evt.type == 9">
                             充值
                         </s:elseif>

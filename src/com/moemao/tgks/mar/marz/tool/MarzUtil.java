@@ -1,10 +1,17 @@
 package com.moemao.tgks.mar.marz.tool;
 
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
+
+import com.moemao.tgks.common.core.spring.ContextUtil;
+import com.moemao.tgks.common.systemconfig.entity.SystemConfigEvt;
+import com.moemao.tgks.common.systemconfig.entity.SystemConfigReq;
+import com.moemao.tgks.common.systemconfig.service.SystemConfigService;
 import com.moemao.tgks.common.tool.CommonUtil;
 import com.moemao.tgks.mar.marz.entity.CardEvt;
 import com.moemao.tgks.mar.marz.entity.ItemEvt;
@@ -118,5 +125,32 @@ public class MarzUtil
         SimpleDateFormat sdf = new SimpleDateFormat("HH");
         int hour = Integer.parseInt(sdf.format(now));
         return (hour == 7 || hour == 13 || hour == 18 || hour == 22);
+    }
+    
+    public static String GenerateHashToken(String uuid) throws Exception
+    {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+        messageDigest.update((uuid + getMarzDBConfig(MarzConstant.DBCONFIG_HASHTOKENKEY)).getBytes("UTF-8"));
+        byte[] base64HashToken = Base64.encodeBase64(messageDigest.digest());
+        
+        return new String(base64HashToken);
+    }
+    
+    public static String GenerateGachaHash(String userId) throws Exception
+    {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+        messageDigest.update((userId + getMarzDBConfig(MarzConstant.DBCONFIG_GACHAHASHKEY)).getBytes("UTF-8"));
+        byte[] base64HashToken = Base64.encodeBase64(messageDigest.digest());
+        
+        return new String(base64HashToken);
+    }
+    
+    public static String getMarzDBConfig(String tag)
+    {
+        SystemConfigService common_systemConfigService = (SystemConfigService) ContextUtil.getBean("common_systemConfigService");
+        SystemConfigReq systemConfigReq = new SystemConfigReq();
+        systemConfigReq.setTag(tag);
+        List<SystemConfigEvt> systemConfigList =  common_systemConfigService.querySystemConfigList(systemConfigReq);
+        return systemConfigList.size() > 0 ? systemConfigList.get(0).getValue() : "";
     }
 }

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" isELIgnored="false" %>
 <%@ include file="/WEB-INF/jsp/common/TGKSHeaderList.inc.jsp" %>
 <input type="hidden" name="marzServerEvt.id" id="marzServerId" value="${marzServerEvt.id }" />
+<input type="hidden" name="marzServerEvt.updateTime" id="marzServerUpdateTime value="${marzServerEvt.updateTime }" />
 <table>
 	<tr>
 		<td>服务器名称</td>

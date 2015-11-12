@@ -1,5 +1,6 @@
 package com.moemao.tgks.mar.marzserver.service.impl;
 
+import java.util.Date;
 import java.util.List;
 
 import com.moemao.tgks.common.tool.CommonUtil;
@@ -121,6 +122,7 @@ public int updateMarzServerUserNum(String ip, int num)
     {
         marzServerEvt = marzServerList.get(0);
         marzServerEvt.setUserNum(num);
+        marzServerEvt.setUpdateTime(new Date());
         mar_marzServerDao.mar_updateMarzServer(marzServerEvt);
     }
     return num;

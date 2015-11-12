@@ -1,5 +1,7 @@
 package com.moemao.tgks.mar.marzserver.entity;
 
+import java.util.Date;
+
 public class MarzServerEvt
 {
 /**
@@ -36,6 +38,8 @@ private String loaclIp;
  * 外网IP
  */
 private String netIp;
+
+private Date updateTime;
 
 @Override
 public String toString()
@@ -153,6 +157,16 @@ public String getNetIp()
 public void setNetIp(String netIp)
 {
     this.netIp = netIp;
+}
+
+public Date getUpdateTime()
+{
+    return updateTime;
+}
+
+public void setUpdateTime(Date updateTime)
+{
+    this.updateTime = updateTime;
 }
 
 }

@@ -17,4 +17,8 @@ public int updateMarzItem(MarzItemEvt marzItemEvt);
 
 public int deleteMarzItem(List<String> ids);
 
+public int onMarzItem(List<String> ids);
+
+public int offMarzItem(List<String> ids);
+
 }

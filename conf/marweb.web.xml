@@ -75,5 +75,10 @@
         <result name="success">/WEB-INF/jsp/common/success.jsp</result>
         <result name="error">/WEB-INF/jsp/common/error.jsp</result>
     </action>
+    
+    <action name="marzNotice" class="com.moemao.tgks.mar.marznotice.action.MarzNoticeAction" method="queryMarzNotice">
+        <result name="success">/WEB-INF/jsp/marweb/notice/notice.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
   </package>
 </struts>

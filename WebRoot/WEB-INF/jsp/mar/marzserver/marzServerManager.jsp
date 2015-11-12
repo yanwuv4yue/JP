@@ -41,8 +41,6 @@
 
 <button id="addMarzServer">新增</button>
 <button id="deleteMarzServer">删除</button>
-<button id="onMarzServer">启用</button>
-<button id="offMarzServer">禁用</button>
 
 <div id="marzServerDiv"></div>
 

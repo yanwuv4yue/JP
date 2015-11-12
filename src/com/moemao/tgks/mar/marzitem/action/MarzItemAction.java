@@ -94,6 +94,23 @@ CommonUtil.debugLog(logger, CommonConstant.SYSTEM_INFO_LOG_METHOD_OUT, "MarzItem
 return SUCCESS;
 }
 
+public String changeStatusMarzItem()
+{
+    String ids = this.getRequest().getParameter("ids");
+    String status = this.getRequest().getParameter("status");
+    
+    if ("0".equals(status))
+    {
+        mar_marzItemService.offMarzItem(CommonUtil.stringToList(ids));
+    }
+    else if ("1".equals(status))
+    {
+        mar_marzItemService.onMarzItem(CommonUtil.stringToList(ids));
+    }
+    
+    return SUCCESS;
+}
+
 /**
  * @return 返回 mar_marzItemService
  */

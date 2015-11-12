@@ -15,4 +15,8 @@ public int mar_addMarzItem(MarzItemEvt marzItemEvt) throws DataAccessException;
 public int mar_updateMarzItem(MarzItemEvt marzItemEvt) throws DataAccessException;
 
 public int mar_deleteMarzItem(List<String> list) throws DataAccessException;
+
+public int mar_onMarzItem(List<String> list) throws DataAccessException;
+
+public int mar_offMarzItem(List<String> list) throws DataAccessException;
 }

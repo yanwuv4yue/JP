@@ -25,6 +25,8 @@
                         <s:if test="#evt.type == 1">药水</s:if>
                         <s:elseif test="#evt.type == 2">钥匙</s:elseif>
                         <s:elseif test="#evt.type == 3">硬币</s:elseif>
+                        <s:elseif test="#evt.type == 4">时装</s:elseif>
+                        <s:elseif test="#evt.type == 5">忠诚</s:elseif>
                     </td>
                     <td>
                         <s:if test="#evt.status == 0">已失效</s:if>

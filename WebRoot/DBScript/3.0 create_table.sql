@@ -123,7 +123,7 @@ DROP TABLE IF EXISTS `t_tgks_mar_marzlog`;
 CREATE TABLE IF NOT EXISTS `t_tgks_mar_marzlog` (
   `id` varchar(30) NOT NULL COMMENT '表唯一主键',
   `tgksId` varchar(30) NOT NULL COMMENT 'TGKS账号的USERNAME',
-  `type` varchar(3) NOT NULL COMMENT '类型（0 系统；1 战斗；2 探索；3 道具使用；4 合成；5 出售；9 充值）',
+  `type` varchar(3) NOT NULL COMMENT '类型（0 系统；1 战斗；2 探索；3 道具使用；4 合成；5 出售；6 PVP；7 抽卡；9 充值）',
   `info` varchar(5000) default NULL COMMENT '状态（0 未使用；1 已使用）',
   `createtime` timestamp NOT NULL default CURRENT_TIMESTAMP COMMENT '创建时间',
   PRIMARY KEY  (`id`)
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS `t_tgks_mar_marzitem` (
   `id` varchar(30) NOT NULL COMMENT '表唯一主键',
   `itemId` varchar(30) NOT NULL COMMENT '物品ID',
   `name` varchar(30) NOT NULL COMMENT '名称',
-  `type` varchar(3) NOT NULL COMMENT '类型（1 药水；2 钥匙；3 硬币）',
+  `type` varchar(3) NOT NULL COMMENT '类型（1 药水；2 钥匙；3 硬币；4 时装兑换物品；5 忠诚度物品）',
   `status` varchar(3) NOT NULL COMMENT '状态（0 已失效；1 生效中）',
   `param` varchar(100) default NULL COMMENT '参数（多个参数时用|分割）',
   PRIMARY KEY  (`id`)
@@ -186,5 +186,19 @@ CREATE TABLE IF NOT EXISTS `t_tgks_mar_marzserver` (
   `accept` varchar(3) NOT NULL COMMENT '是否分流（0 禁止分流；1 允许分流）',
   `loaclIp` varchar(30) NOT NULL COMMENT '本地IP',
   `netIp` varchar(30) NOT NULL COMMENT '外网IP',
+  `updatetime` timestamp NOT NULL default CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='挂机服务器表';
+
+--
+-- 表的结构 `t_tgks_mar_marznotice`
+--
+DROP TABLE IF EXISTS `t_tgks_mar_marznotice`;
+CREATE TABLE IF NOT EXISTS `t_tgks_mar_marznotice` (
+  `id` varchar(30) NOT NULL COMMENT '表唯一主键',
+  `title` varchar(500) NOT NULL COMMENT '公告标题',
+  `url` varchar(200) default '' COMMENT '公告链接',
+  `level` varchar(3) NOT NULL default '0' COMMENT '级别（0 普通；1 重要）',
+  `createtime` timestamp NOT NULL default CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='公告信息表';

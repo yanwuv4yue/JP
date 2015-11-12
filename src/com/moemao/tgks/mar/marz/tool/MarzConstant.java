@@ -8,6 +8,14 @@ public class MarzConstant
     
     public static final int FAILED = -1;
     
+    public static final String DBCONFIG_LOGIN_CLVER_IOS = "marz_login_clver_ios";
+    
+    public static final String DBCONFIG_LOGIN_CLVER_ANDROID = "marz_login_clver_android";
+    
+    public static final String DBCONFIG_HASHTOKENKEY = "marz_hashTokenKey";
+    
+    public static final String DBCONFIG_GACHAHASHKEY = "marz_gachaHashKey";
+    
     public static final int RES_CODE_SUCCESS_0 = 0;
 
     /**
@@ -203,6 +211,16 @@ public class MarzConstant
      * MARZ物品类型 3 硬币
      */
     public static final String MARZITEM_TYPE_3 = "3";
+    
+    /**
+     * MARZ物品类型 4 时装兑换物品
+     */
+    public static final String MARZITEM_TYPE_4 = "4";
+    
+    /**
+     * MARZ物品类型 5 忠诚度物品
+     */
+    public static final String MARZITEM_TYPE_5 = "5";
     
     /**
      * MARZ物品状态 0 已失效

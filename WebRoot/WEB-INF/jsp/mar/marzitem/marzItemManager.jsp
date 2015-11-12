@@ -23,6 +23,8 @@
                         <option value="1">药水</option>
                         <option value="2">钥匙</option>
                         <option value="3">硬币</option>
+                        <option value="4">时装</option>
+                        <option value="5">忠诚</option>
                     </select>
                 </td>
                 <td>状态</td>

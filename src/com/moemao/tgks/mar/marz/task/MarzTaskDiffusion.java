@@ -531,7 +531,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             List<MarzItemEvt> marzItemList = this.marzItemService.queryMarzItem(marzItemReq);
             
             // add by ken 20150907 for presentRecv time limit
-            if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOPRESENTRECV) && MarzUtil.inFreeTime())
+            if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOPRESENTRECV) && MarzUtil.inPvpTime())
             {
                 // 先看看任务里面有没有可收取的
                 map = request.missionShow(sid);
@@ -1691,7 +1691,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                 MarzMapEvt map = MarzDataPool.getInstance().getMarzMapByBossId(m.getBossId());
                                 if (null != map)
                                 {
-                                    bossEvt.setProcess(map.getProcess());
+                                    //bossEvt.setProcess(map.getProcess());
                                     bossEvt.setTarget(map.getTarget());
                                     //mapEvt.setEnemy(mapList.get(0).getEnemy());
                                 }
@@ -1943,7 +1943,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     private int pvp()
     {
         // add by ken 20150907 for pvp time limit
-        if (!MarzUtil.inFreeTime())
+        if (!MarzUtil.inPvpTime())
         {
             return MarzConstant.SUCCESS;
         }
@@ -2201,7 +2201,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
      * @return void 返回类型
      * @throws
      */
-    private void saveAccount()
+    private void saveAccount() throws Exception
     {
         // 保存之前先查询最新的数据 防止脏数据情况发生
         MarzAccountEvt tempAccount = this.marzAccountService.queryMarzAccountById(account.getId());
@@ -2209,6 +2209,11 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         account.setSellCardIds(tempAccount.getSellCardIds());
         account.setFameCardIds(tempAccount.getFameCardIds());
         account.setStatus(tempAccount.getStatus());
+        
+        if (CommonUtil.isEmpty(account.getGachaHash()))
+        {
+            account.setGachaHash(MarzUtil.GenerateGachaHash(account.getUserId()));
+        }
         
         this.marzAccountService.updateMarzAccount(account);
     }

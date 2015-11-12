@@ -12,6 +12,7 @@
 				<th>分流</th>
 				<th>本地IP</th>
 				<th>外网IP</th>
+				<th>更新时间</th>
             </tr>
         </thead>
         <tbody>
@@ -29,7 +30,8 @@
                         <s:elseif test="#evt.accept == 1">允许</s:elseif>
 					</td>
 					<td><s:property value="#evt.loaclIp"/></td>
-					<td><s:property value="#evt.netIp"/></td>
+                    <td><s:property value="#evt.netIp"/></td>
+                    <td><s:date name="#evt.updateTime" format="yyyy-MM-dd HH:mm:ss"/></td>
 				</tr>
 			</s:iterator>
 		</tbody>

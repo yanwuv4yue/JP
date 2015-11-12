@@ -11,5 +11,6 @@
         <result property="accept" column="ACCEPT" />
         <result property="loaclIp" column="LOACLIP" />
         <result property="netIp" column="NETIP" />
+        <result property="updateTime" column="UPDATETIME" />
     </resultMap>
 </mapper>

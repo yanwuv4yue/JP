@@ -365,6 +365,11 @@
         <result name="error">/WEB-INF/jsp/common/error.jsp</result>
     </action>
     
+    <action name="changeStatusMarzItem" class="com.moemao.tgks.mar.marzitem.action.MarzItemAction" method="changeStatusMarzItem">
+        <result name="success">/WEB-INF/jsp/common/success.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+    
     <!-- mar_marzserver -->
     <action name="marzServerManager" class="com.moemao.tgks.mar.marzserver.action.MarzServerAction" method="marzServerManager">
         <result name="success">/WEB-INF/jsp/mar/marzserver/marzServerManager.jsp</result>
@@ -387,6 +392,32 @@
     </action>
 
     <action name="deleteMarzServer" class="com.moemao.tgks.mar.marzserver.action.MarzServerAction" method="deleteMarzServer">
+        <result name="success">/WEB-INF/jsp/common/success.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+    
+    <!-- mar_marznotice -->
+    <action name="marzNoticeManager" class="com.moemao.tgks.mar.marznotice.action.MarzNoticeAction" method="marzNoticeManager">
+        <result name="success">/WEB-INF/jsp/mar/marznotice/marzNoticeManager.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+
+    <action name="queryMarzNotice" class="com.moemao.tgks.mar.marznotice.action.MarzNoticeAction" method="queryMarzNotice">
+        <result name="success">/WEB-INF/jsp/mar/marznotice/marzNoticeList.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+
+    <action name="editMarzNoticePage" class="com.moemao.tgks.mar.marznotice.action.MarzNoticeAction" method="editMarzNoticePage">
+        <result name="success">/WEB-INF/jsp/mar/marznotice/marzNoticeEdit.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+
+    <action name="editMarzNotice" class="com.moemao.tgks.mar.marznotice.action.MarzNoticeAction" method="editMarzNotice">
+        <result name="success">/WEB-INF/jsp/common/success.jsp</result>
+        <result name="error">/WEB-INF/jsp/common/error.jsp</result>
+    </action>
+
+    <action name="deleteMarzNotice" class="com.moemao.tgks.mar.marznotice.action.MarzNoticeAction" method="deleteMarzNotice">
         <result name="success">/WEB-INF/jsp/common/success.jsp</result>
         <result name="error">/WEB-INF/jsp/common/error.jsp</result>
     </action>

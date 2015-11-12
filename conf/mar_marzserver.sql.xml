@@ -5,7 +5,7 @@
 <mapper namespace="com.moemao.tgks.mar.marzserver.dao.MarzServerDao">
 <select id="mar_queryMarzServer" parameterType="MarzServerReq" resultType="MarzServerEvt" resultMap="MarzServerEvtMap">
         <![CDATA[  
-            SELECT t.id, t.servername, t.usernum, t.status, t.accept, t.loaclip, t.netip FROM t_tgks_mar_marzserver t
+            SELECT t.id, t.servername, t.usernum, t.status, t.accept, t.loaclip, t.netip, t.updatetime FROM t_tgks_mar_marzserver t
         ]]>
         <where>
                 1=1
@@ -38,7 +38,7 @@
 
 <select id="mar_queryMarzServerByIds" parameterType="list" resultType="MarzServerEvt" resultMap="MarzServerEvtMap">
         <![CDATA[  
-            SELECT t.id, t.servername, t.usernum, t.status, t.accept, t.loaclip, t.netip FROM t_tgks_mar_marzserver t WHERE id IN
+            SELECT t.id, t.servername, t.usernum, t.status, t.accept, t.loaclip, t.netip, t.updatetime FROM t_tgks_mar_marzserver t WHERE id IN
         ]]>
         <foreach collection="list" item="ids"  open="(" separator="," close=")">
             #{ids}
@@ -47,8 +47,8 @@
 
 <insert id="mar_addMarzServer" parameterType="MarzServerEvt">
         <![CDATA[  
-            INSERT INTO t_tgks_mar_marzserver (id, servername, usernum, status, accept, loaclip, netip) 
-            VALUES (#{id}, #{serverName}, #{userNum}, #{status}, #{accept}, #{loaclIp}, #{netIp}) 
+            INSERT INTO t_tgks_mar_marzserver (id, servername, usernum, status, accept, loaclip, netip, updatetime) 
+            VALUES (#{id}, #{serverName}, #{userNum}, #{status}, #{accept}, #{loaclIp}, #{netIp}, #{updateTime}) 
         ]]>
 </insert>
 
@@ -60,7 +60,8 @@
                        status = #{status},
                        accept = #{accept},
                        loaclip = #{loaclIp},
-                       netip = #{netIp}
+                       netip = #{netIp},
+                       updatetime = #{updateTime}
              WHERE ID = #{id}
         ]]>
 </update>

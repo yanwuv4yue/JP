@@ -70,4 +70,16 @@ public void setMar_marzItemDao(MarzItemDao mar_marzItemDao)
     this.mar_marzItemDao = mar_marzItemDao;
 }
 
+@Override
+public int onMarzItem(List<String> ids)
+{
+    return mar_marzItemDao.mar_onMarzItem(ids);
+}
+
+@Override
+public int offMarzItem(List<String> ids)
+{
+    return mar_marzItemDao.mar_offMarzItem(ids);
+}
+
 }

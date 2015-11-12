@@ -13,6 +13,8 @@
         <td>
             <select name="marzItemEvt.type">
                 <option value="3" <s:if test="marzItemEvt.type == 3">selected="selected"</s:if>>硬币</option>
+                <option value="4" <s:if test="marzItemEvt.type == 4">selected="selected"</s:if>>时装</option>
+                <option value="5" <s:if test="marzItemEvt.type == 5">selected="selected"</s:if>>忠诚</option>
                 <option value="2" <s:if test="marzItemEvt.type == 2">selected="selected"</s:if>>钥匙</option>
                 <option value="1" <s:if test="marzItemEvt.type == 1">selected="selected"</s:if>>药水</option>
             </select>
