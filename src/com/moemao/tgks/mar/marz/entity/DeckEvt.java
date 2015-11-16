@@ -19,14 +19,16 @@ import net.sf.json.JSONObject;
 public class DeckEvt
 {
     private String arthur_type; // 0
-    private String idx; // 1
+    private String deck_idx; // 1
     private String job_type; // 2
     private String leader_card_idx; // 3
     private String card_uniqid; // 4
-    private String name; // 5
-    private String is_active; // 6
-    private String is_rental; // 7
-    private String deck_rank; // 8
+    private String support_card_uniqid; // 5
+    private String sphr_uniqid; // 6
+    private String name; // 7
+    private String is_active; // 8
+    private String is_rental; // 9
+    private String deck_rank; // 10
     
     public DeckEvt()
     {
@@ -40,9 +42,11 @@ public class DeckEvt
     public DeckEvt(JSONObject deckJSON)
     {
         this.setArthur_type(deckJSON.getString("0"));
-        this.setIdx(deckJSON.getString("1"));
+        this.setDeck_idx(deckJSON.getString("1"));
         this.setJob_type(deckJSON.getString("2"));
         this.setCard_uniqid(deckJSON.getString("4"));
+        this.setSupport_card_uniqid(deckJSON.getString("5"));
+        this.setSphr_uniqid(deckJSON.getString("6"));
     }
 
     public String getArthur_type()
@@ -55,14 +59,34 @@ public class DeckEvt
         this.arthur_type = arthur_type;
     }
 
-    public String getIdx()
+    public String getDeck_idx()
     {
-        return idx;
+        return deck_idx;
     }
 
-    public void setIdx(String idx)
+    public void setDeck_idx(String deck_idx)
     {
-        this.idx = idx;
+        this.deck_idx = deck_idx;
+    }
+
+    public String getSupport_card_uniqid()
+    {
+        return support_card_uniqid;
+    }
+
+    public void setSupport_card_uniqid(String support_card_uniqid)
+    {
+        this.support_card_uniqid = support_card_uniqid;
+    }
+
+    public String getSphr_uniqid()
+    {
+        return sphr_uniqid;
+    }
+
+    public void setSphr_uniqid(String sphr_uniqid)
+    {
+        this.sphr_uniqid = sphr_uniqid;
     }
 
     public String getJob_type()

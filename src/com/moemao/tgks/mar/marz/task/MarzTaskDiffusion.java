@@ -2,7 +2,6 @@ package com.moemao.tgks.mar.marz.task;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +78,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     /**
      * 账户的四职业第一卡组
      */
-    private Map<String, String> deckMap;
+    private Map<String, DeckEvt> deckMap;
     
     private Map<String, String> pvpEndMap;
     
@@ -854,12 +853,23 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 }
                 
                 // add by Ken 2015-7-9 进化材料单独变成数量统计
+                // update by Ken 2015-11-06 狗粮被一起分到材料中变为数量统计
                 // cardShow2接口中的1
+                JSONArray chiarisJSON = cardShowJSON.getJSONArray("1");
+                
+                Map<String, Integer> chiariMap = new HashMap<String, Integer>();
+                JSONObject chiariJSON;
+                
+                for (int i = 0, size = chiarisJSON.size(); i < size; i++)
+                {
+                    chiariJSON = JSONObject.fromObject(chiarisJSON.get(i));
+                    chiariMap.put(chiariJSON.getString("0"), chiariJSON.getInt("1"));
+                }
                 
                 // add by Ken 2015-6-3 for PVP & Solo
                 // cardShow2接口中 decks → 2
                 JSONArray decksJSON = cardShowJSON.getJSONArray("2");
-                deckMap = new HashMap<String, String>();
+                deckMap = new HashMap<String, DeckEvt>();
                 JSONObject deckJSON;
                 DeckEvt deckEvt;
                 
@@ -867,36 +877,34 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 {
                     deckJSON = JSONObject.fromObject(decksJSON.get(i));
                     deckEvt = new DeckEvt(deckJSON);
-                    if ("1".equals(deckEvt.getArthur_type()) && "0".equals(deckEvt.getIdx()) && "1".equals(deckEvt.getJob_type()))
+                    if ("1".equals(deckEvt.getArthur_type()) && "0".equals(deckEvt.getDeck_idx()) && "1".equals(deckEvt.getJob_type()))
                     {
                         // 佣兵第一卡组
-                        deckMap.put("1", deckEvt.getCard_uniqid().replace("[", "").replace("]", ""));
+                        deckMap.put("1", deckEvt);
                     }
-                    else if ("2".equals(deckEvt.getArthur_type()) && "0".equals(deckEvt.getIdx()) && "2".equals(deckEvt.getJob_type()))
+                    else if ("2".equals(deckEvt.getArthur_type()) && "0".equals(deckEvt.getDeck_idx()) && "2".equals(deckEvt.getJob_type()))
                     {
                         // 富豪第一卡组
-                        deckMap.put("2", deckEvt.getCard_uniqid().replace("[", "").replace("]", ""));
+                        deckMap.put("2", deckEvt);
                     }
-                    else if ("3".equals(deckEvt.getArthur_type()) && "0".equals(deckEvt.getIdx()) && "3".equals(deckEvt.getJob_type()))
+                    else if ("3".equals(deckEvt.getArthur_type()) && "0".equals(deckEvt.getDeck_idx()) && "3".equals(deckEvt.getJob_type()))
                     {
                         // 盗贼第一卡组
-                        deckMap.put("3", deckEvt.getCard_uniqid().replace("[", "").replace("]", ""));
+                        deckMap.put("3", deckEvt);
                     }
-                    else if ("4".equals(deckEvt.getArthur_type()) && "0".equals(deckEvt.getIdx()) && "4".equals(deckEvt.getJob_type()))
+                    else if ("4".equals(deckEvt.getArthur_type()) && "0".equals(deckEvt.getDeck_idx()) && "4".equals(deckEvt.getJob_type()))
                     {
                         // 歌姬第一卡组
-                        deckMap.put("4", deckEvt.getCard_uniqid().replace("[", "").replace("]", ""));
+                        deckMap.put("4", deckEvt);
                     }
                 }
                 
                 // 这三个用来调用接口
                 List<String> cardSellIdList = new ArrayList<String>();
-                List<String> chiariFusionIdList = new ArrayList<String>();
                 List<String> fameFusionIdList = new ArrayList<String>();
                 
                 // 这三个用来记录日志以及从cardList中remove掉
                 List<CardEvt> cardSellCardList = new ArrayList<CardEvt>();
-                List<CardEvt> chiariFusionCardList = new ArrayList<CardEvt>();
                 List<CardEvt> fameFusionCardList = new ArrayList<CardEvt>();
                 
                 // 自动卖卡
@@ -908,12 +916,12 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     if (validateSetting(MarzConstant.VALIDATE_SETTING_CARDSELL_COMMON))
                     {
                         // 金币卡
-                        userSellList.add("20000026");
-                        userSellList.add("20000027");
-                        userSellList.add("20000028");
-                        userSellList.add("20000029");
+                        //userSellList.add("20000026");
+                        //userSellList.add("20000027");
+                        //userSellList.add("20000028");
+                        //userSellList.add("20000029");
                         // 蓝狗粮
-                        userSellList.add("20000001");
+                        //userSellList.add("20000001");
                         // 2星进化素材
                         //userSellList.add("20000009");
                         //userSellList.add("20000008");
@@ -1109,14 +1117,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 // 狗粮合成
                 if (validateSetting(MarzConstant.VALIDATE_SETTING_CHIARIFUSION))
                 {
-                    // 只自动喂 蓝狗 红狗 粉狗
-                    String[] chiari = {"20000001", "20000002", "20000003"};
-                    // 都喂光了 再上MR
-                    String chiariMr = "20000004";
                     CardEvt baseCard = null;
-
-                    chiariFusionIdList.clear();
-                    chiariFusionCardList.clear();
                     
                     for (CardEvt card : cardList)
                     {
@@ -1155,44 +1156,15 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         }
                     }
                     
-                    for (CardEvt card : cardList)
+                    // 到此 baseCard已经确认，接下来看是否有狗粮可以喂
+                    // 3.2.0版本之后，狗粮也被合并到材料中，只显示个数，不显示单张卡
+                    String[] chiaris = {"20000002", "20000003", "20000004"};
+                    List<String> chiariFusionIdList = new ArrayList<String>();
+                    for (String id : chiaris)
                     {
-                        // 狗粮 一次喂4个 不能是已经出售了的
-                        if (!cardSellIdList.contains(card.getUniqid()) 
-                                && Arrays.asList(chiari).contains(card.getCardid())
-                                && !chiariFusionIdList.contains(card.getUniqid())
-                                && chiariFusionIdList.size() < 4
-                                && 0 == card.getIs_lock())
+                        if (chiariMap.get(id) > 0)
                         {
-                            chiariFusionIdList.add(card.getUniqid());
-                            chiariFusionCardList.add(card);
-                        }
-                        
-                        if (null != baseCard && chiariFusionIdList.size() == 4)
-                        {
-                            break;
-                        }
-                    }
-                    
-                    if (null != baseCard && chiariFusionIdList.size() == 0)
-                    {
-                        for (CardEvt card : cardList)
-                        {
-                            // 如果只剩下MR狗粮 那一次喂2张
-                            if (!cardSellIdList.contains(card.getUniqid()) 
-                                    && chiariMr.equals(card.getCardid())
-                                    && !chiariFusionIdList.contains(card.getUniqid())
-                                    && chiariFusionIdList.size() < 2
-                                    && 0 == card.getIs_lock())
-                            {
-                                chiariFusionIdList.add(card.getUniqid());
-                                chiariFusionCardList.add(card);
-                            }
-                            
-                            if (null != baseCard && chiariFusionIdList.size() == 2)
-                            {
-                                break;
-                            }
+                            chiariFusionIdList.add(id);
                         }
                     }
                     
@@ -1209,221 +1181,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             account.setCardNum(map.get(MarzConstant.JSON_TAG_CARDFUSION).getInt("card_num"));
                             account.setGold(map.get(MarzConstant.JSON_TAG_CARDFUSION).getInt("gold"));
                             
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_4, "主卡 " + MarzUtil.getFaceImageUrl(baseCard) + " 消耗狗粮 " + MarzUtil.getFaceImageUrlByList(chiariFusionCardList));
-                            
-                            cardList.removeAll(chiariFusionCardList);
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            return MarzConstant.FAILED;
-        }
-        
-        return resultCode;
-    }
-    
-    
-    
-    @SuppressWarnings("unused")
-    private int card_old()
-    {
-        try
-        {
-            // 更新卡片信息
-            map = request.cardShow(sid);
-            
-            resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-            
-            //this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "卡片信息更新" + MarzUtil.resultCodeStr(resultCode));
-            
-            if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-            {
-                sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                
-                JSONObject card = map.get(MarzConstant.JSON_TAG_CARDSHOW);
-                JSONArray cards = card.getJSONArray("cards");
-                
-                List<String> cardSellList = new ArrayList<String>();
-                List<String> cardFusionList = new ArrayList<String>();
-                JSONObject cardJSON;
-                
-                // 自动卖卡
-                if (validateSetting(MarzConstant.VALIDATE_SETTING_CARDSELL))
-                {
-                    // 查询用户设定的售卡列表
-                    List<String> userSellList = new ArrayList<String>();
-                    
-                    if (validateSetting(MarzConstant.VALIDATE_SETTING_CARDSELL_COMMON))
-                    {
-                        // 金币卡
-                        userSellList.add("20000026");
-                        userSellList.add("20000027");
-                        userSellList.add("20000028");
-                        userSellList.add("20000029");
-                        // 蓝狗粮
-                        userSellList.add("20000001");
-                        // 2星进化素材
-                        userSellList.add("20000009");
-                        userSellList.add("20000008");
-                        userSellList.add("20000007");
-                        userSellList.add("20000006");
-                        userSellList.add("20000005");
-                    }
-            
-                    // 遍历所有卡片 把需要出售的卡片ID放入cardSellList
-                    for (int i = 0; i < cards.size(); i++)
-                    {
-                        cardJSON = JSONObject.fromObject(cards.get(i));
-                        // 只能出售未锁定以及是1级的卡
-                        if (0 == cardJSON.getInt("is_lock") && 1 == cardJSON.getInt("lv"))
-                        {
-                            // 先卖 出售列表中的卡
-                            if (userSellList.contains(cardJSON.getString("cardid")))
-                            {
-                                cardSellList.add(cardJSON.getString("uniqid"));
-                            }
-                            // 然后卖一些基础的垃圾卡 10~30
-                            else if (validateSetting(MarzConstant.VALIDATE_SETTING_CARDSELL_COMMON)
-                                    && cardJSON.getInt("lv_max") >= 10 && cardJSON.getInt("lv_max") <= 30)
-                            {
-                                cardSellList.add(cardJSON.getString("uniqid"));
-                            }
-                        }
-                        
-                        // 当出售的卡片满10张时 跳出
-                        if (cardSellList.size() == 10)
-                        {
-                            break;
-                        }
-                    }
-                    
-                    // 组装卡牌ID调用cardSell请求
-                    if (cardSellList.size() > 0)
-                    {
-                        map = request.cardSell(sid, MarzUtil.listToString(cardSellList));
-                        
-                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                        
-                        //this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_5, "卡片出售" + MarzUtil.resultCodeStr(resultCode));
-                        
-                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-                        {
-                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            
-                            account.setCardNum(map.get(MarzConstant.JSON_TAG_CARDSELL).getInt("card_num"));
-                            account.setGold(account.getGold() + map.get(MarzConstant.JSON_TAG_CARDSELL).getInt("get_gold"));
-                            
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_5, "已卖出卡片ID " + MarzUtil.listToString(cardSellList));
-                        }
-                    }
-                }
-                
-                // 狗粮合成
-                if (validateSetting(MarzConstant.VALIDATE_SETTING_CHIARIFUSION))
-                {
-                    // 只自动喂 蓝狗 红狗 粉狗
-                    String[] chiari = {"20000001", "20000002", "20000003"};
-                    String baseId = "";
-                    
-                    for (int i = 0; i < cards.size(); i++)
-                    {
-                        cardJSON = JSONObject.fromObject(cards.get(i));
-                        
-                        // 自动合成只支持SR UR跟MR 而且必须手动锁上 先找MR 不锁也可
-                        if (cardJSON.getInt("lv_max") >= 60 && cardJSON.getInt("lv") < cardJSON.getInt("lv_max"))
-                        {
-                            baseId = cardJSON.getString("uniqid");
-                        }
-                        // 狗粮 一次喂4个 不能是已经出售了的
-                        else if (!cardSellList.contains(cardJSON.getString("uniqid")) 
-                                && Arrays.asList(chiari).contains(cardJSON.getString("cardid"))
-                                && !cardFusionList.contains(cardJSON.getString("uniqid"))
-                                && cardFusionList.size() < 4)
-                        {
-                            cardFusionList.add(cardJSON.getString("uniqid"));
-                        }
-                        
-                        if (!CommonUtil.isEmpty(baseId) && cardFusionList.size() == 4)
-                        {
-                            break;
-                        }
-                    }
-                    // 如果没有MR以上的卡 再挑UR喂
-                    if (CommonUtil.isEmpty(baseId))
-                    {
-                        for (int i = 0; i < cards.size(); i++)
-                        {
-                            cardJSON = JSONObject.fromObject(cards.get(i));
-                            
-                            // 没有MR可喂的时候，找锁上的UR喂
-                            if (cardJSON.getInt("lv_max") >= 50 && cardJSON.getInt("lv") < cardJSON.getInt("lv_max")
-                                && 0 != cardJSON.getInt("is_lock"))
-                            {
-                                baseId = cardJSON.getString("uniqid");
-                            }
-                            // 狗粮 一次喂4个 不能是已经出售了的
-                            else if (!cardSellList.contains(cardJSON.getString("uniqid")) 
-                                    && Arrays.asList(chiari).contains(cardJSON.getString("cardid"))
-                                    && !cardFusionList.contains(cardJSON.getString("uniqid"))
-                                    && cardFusionList.size() < 4)
-                            {
-                                cardFusionList.add(cardJSON.getString("uniqid"));
-                            }
-                            
-                            if (!CommonUtil.isEmpty(baseId) && cardFusionList.size() == 4)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    // 如果没有UR以上的卡 再挑SR喂
-                    if (CommonUtil.isEmpty(baseId))
-                    {
-                        for (int i = 0; i < cards.size(); i++)
-                        {
-                            cardJSON = JSONObject.fromObject(cards.get(i));
-                            
-                            // 没有MR UR可喂的时候，找锁上的SR喂
-                            if (cardJSON.getInt("lv_max") >= 40 && cardJSON.getInt("lv") < cardJSON.getInt("lv_max")
-                                        && 0 != cardJSON.getInt("is_lock"))
-                            {
-                                baseId = cardJSON.getString("uniqid");
-                            }
-                            // 狗粮 一次喂4个 不能是已经出售了的
-                            else if (!cardSellList.contains(cardJSON.getString("uniqid")) 
-                                    && Arrays.asList(chiari).contains(cardJSON.getString("cardid"))
-                                    && !cardFusionList.contains(cardJSON.getString("uniqid"))
-                                    && cardFusionList.size() < 4)
-                            {
-                                cardFusionList.add(cardJSON.getString("uniqid"));
-                            }
-                            
-                            if (!CommonUtil.isEmpty(baseId) && cardFusionList.size() == 4)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (!CommonUtil.isEmpty(baseId) && cardFusionList.size() > 0)
-                    {
-                        map = request.cardFusion(sid, baseId, MarzUtil.listToString(cardFusionList));
-                        
-                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                        
-                        //this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_4, "卡片合成" + MarzUtil.resultCodeStr(resultCode));
-                        
-                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-                        {
-                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            
-                            account.setCardNum(map.get(MarzConstant.JSON_TAG_CARDFUSION).getInt("card_num"));
-                            account.setGold(map.get(MarzConstant.JSON_TAG_CARDFUSION).getInt("gold"));
-                            
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_4, "主卡ID " + baseId + " 消耗狗粮 " + MarzUtil.listToString(cardFusionList));
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_4, "主卡 " + MarzUtil.getFaceImageUrl(baseCard) + " 消耗狗粮 " + MarzUtil.getFaceImageUrlByIdList(chiariFusionIdList));
                         }
                     }
                 }

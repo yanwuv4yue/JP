@@ -33,6 +33,7 @@ import net.sf.json.JSONObject;
         is_lock              16  15
         create_time      17  16
         fame                18  17
+        loyalty                    18
  */
 public class CardEvt
 {
@@ -55,6 +56,7 @@ public class CardEvt
     private int is_lock;
     private int create_time;
     private int fame;
+    private int loyalty;
     
     public CardEvt()
     {
@@ -83,6 +85,7 @@ public class CardEvt
         this.setIs_lock(cardJSON.getInt("15"));
         this.setCreate_time(cardJSON.getInt("16"));
         this.setFame(cardJSON.getInt("17"));
+        this.setLoyalty(cardJSON.getInt("18"));
     }
     
     public String getUniqid()
@@ -236,5 +239,15 @@ public class CardEvt
     public void setFame(int fame)
     {
         this.fame = fame;
+    }
+
+    public int getLoyalty()
+    {
+        return loyalty;
+    }
+
+    public void setLoyalty(int loyalty)
+    {
+        this.loyalty = loyalty;
     }
 }

@@ -8,7 +8,7 @@ import java.util.Map;
 
 import net.sf.json.JSONObject;
 
-import com.moemao.tgks.common.tool.CommonUtil;
+import com.moemao.tgks.mar.marz.entity.DeckEvt;
 import com.moemao.tgks.mar.marz.tool.MarzConstant;
 import com.moemao.tgks.mar.marz.tool.MarzUtil;
 import com.moemao.tgks.mar.net.HttpRequest;
@@ -521,7 +521,7 @@ public class MarzRequest
      * @return Map<String,JSONObject> 返回类型
      * @throws
      */
-    public Map<String, JSONObject> pvpStart(String sid, String pvpType, String arthur_type, Map<String, String> deckMap) throws Exception
+    public Map<String, JSONObject> pvpStart(String sid, String pvpType, String arthur_type, Map<String, DeckEvt> deckMap) throws Exception
     {
         map = new HashMap<String, JSONObject>();
         
@@ -536,10 +536,10 @@ public class MarzRequest
         }
         
         String startInfo = "{\"type\":" + pvpType + ",\"pvp_my_deck\":["
-            + "{\"arthur_type\":" + arthur_type + ",\"job_type\":" + arthur_type + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":[" + deckMap.get(arthur_type) + "],\"sphr_uniqid\":[0,0,0]},"
-            + "{\"arthur_type\":" + typeList.get(0) + ",\"job_type\":" + typeList.get(0) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":[" + deckMap.get(typeList.get(0)) + "],\"sphr_uniqid\":[0,0,0]},"
-            + "{\"arthur_type\":" + typeList.get(1) + ",\"job_type\":" + typeList.get(1) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":[" + deckMap.get(typeList.get(1)) + "],\"sphr_uniqid\":[0,0,0]},"
-            + "{\"arthur_type\":" + typeList.get(2) + ",\"job_type\":" + typeList.get(2) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":[" + deckMap.get(typeList.get(2)) + "],\"sphr_uniqid\":[0,0,0]}]}";
+            + "{\"arthur_type\":" + arthur_type + ",\"job_type\":" + arthur_type + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":" + deckMap.get(arthur_type).getCard_uniqid() + ",\"support_card_uniqid\":" + deckMap.get(arthur_type).getSupport_card_uniqid() + ",\"sphr_uniqid\":" + deckMap.get(arthur_type).getSphr_uniqid() + "},"
+            + "{\"arthur_type\":" + typeList.get(0) + ",\"job_type\":" + typeList.get(0) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":" + deckMap.get(typeList.get(0)).getCard_uniqid() + ",\"support_card_uniqid\":" + deckMap.get(typeList.get(0)).getSupport_card_uniqid() + ",\"sphr_uniqid\":" + deckMap.get(typeList.get(0)).getSphr_uniqid() + "},"
+            + "{\"arthur_type\":" + typeList.get(1) + ",\"job_type\":" + typeList.get(1) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":" + deckMap.get(typeList.get(1)).getCard_uniqid() + ",\"support_card_uniqid\":" + deckMap.get(typeList.get(1)).getSupport_card_uniqid() + ",\"sphr_uniqid\":" + deckMap.get(typeList.get(1)).getSphr_uniqid() + "},"
+            + "{\"arthur_type\":" + typeList.get(2) + ",\"job_type\":" + typeList.get(2) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":" + deckMap.get(typeList.get(2)).getCard_uniqid() + ",\"support_card_uniqid\":" + deckMap.get(typeList.get(2)).getSupport_card_uniqid() + ",\"sphr_uniqid\":" + deckMap.get(typeList.get(2)).getSphr_uniqid() + "}]}";
         
         String paramStr = sid + "=" + startInfo;
         
