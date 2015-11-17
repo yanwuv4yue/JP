@@ -2,6 +2,8 @@ package com.moemao.tgks.mar.marz.task;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,7 @@ import com.moemao.tgks.mar.marzsetting.entity.MarzSettingEvt;
 import com.moemao.tgks.mar.marzsetting.entity.MarzSettingReq;
 import com.moemao.tgks.mar.marzsetting.service.MarzSettingService;
 import com.moemao.tgks.mar.tool.MarConstant;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
 {
@@ -1098,7 +1101,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 		if (null != baseFameCard && fameFusionIdList.size() > 0)
                 		{
                 			// 调用合成接口
-                			map = request.cardFusion(sid, baseFameCard.getUniqid(), MarzUtil.listToString(fameFusionIdList));
+                			map = request.cardFusion(sid, baseFameCard.getUniqid(), MarzUtil.listToString(fameFusionIdList), "");
                             
                             resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                             
@@ -1160,7 +1163,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     // 3.2.0版本之后，狗粮也被合并到材料中，只显示个数，不显示单张卡
                     String[] chiaris = {"20000002", "20000003", "20000004"};
                     List<String> chiariFusionIdList = new ArrayList<String>();
-                    for (String id : chiaris)
+                    for (String id :  Arrays.asList(chiaris))
                     {
                         if (chiariMap.get(id) > 0)
                         {
@@ -1170,7 +1173,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     
                     if (null != baseCard && chiariFusionIdList.size() > 0)
                     {
-                        map = request.cardFusion(sid, baseCard.getUniqid(), MarzUtil.listToString(chiariFusionIdList));
+                        map = request.cardFusion(sid, baseCard.getUniqid(), "", MarzUtil.listToString(chiariFusionIdList));
                         
                         resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                         
@@ -1756,6 +1759,17 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         missionList.add(new MissionEvt(missionJSON));
                     }
                     
+                    for (MissionEvt m : missionList)
+                    {
+                        // 这里过滤任务只做收取任务奖励使用
+                        if ("1".equals(m.getState()))
+                        {
+                            map = this.request.missionReward(sid, m.getMissionid());
+                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "收取任务奖励：" + m.getTitle());
+                        }
+                    }
+                    
                     // 这里选出PVP的主职业
                     String arthurPvpType = "1";
                     boolean freePVP = false;
@@ -1784,6 +1798,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     }
                     
                     // 防止PVP经常少一场
+                    /*
                     if (freePVP)
                     {
                         map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_0, arthurPvpType, deckMap);
@@ -1805,12 +1820,13 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             }
                         }
                     }
+                    */
                     
-                    map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_1, arthurPvpType, deckMap);
-                    resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                    
-                    if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                    if (freePVP)
                     {
+                        map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_0, arthurPvpType, deckMap);
+                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                        
                         sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
                         
                         JSONObject pvpStart = map.get(MarzConstant.JSON_TAG_PVPSTART);
@@ -1830,7 +1846,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_6, "斗技场PVP战斗结束，战斗结果：胜利");
                             
                             sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            
+                            /*
                             JSONObject pvpEnd = map.get(MarzConstant.JSON_TAG_RESCODE);
                             
                             if (JSONObject.fromObject(pvpEnd.getJSONArray("notification").get(0)).getInt("mission_clear_receive") > 0)
@@ -1853,19 +1869,9 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                         missionJSON = JSONObject.fromObject(missions.get(i));
                                         missionList.add(new MissionEvt(missionJSON));
                                     }
-                                    
-                                    for (MissionEvt m : missionList)
-                                    {
-                                        // 这里过滤任务只做收取任务奖励使用
-                                        if ("1".equals(m.getState()))
-                                        {
-                                            map = this.request.missionReward(sid, m.getMissionid());
-                                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "收取任务奖励：" + m.getTitle());
-                                        }
-                                    }
                                 }
                             }
+                            */
                         }
                     }
                 }

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import net.sf.json.JSONObject;
 
+import com.moemao.tgks.common.tool.CommonUtil;
 import com.moemao.tgks.mar.marz.entity.DeckEvt;
 import com.moemao.tgks.mar.marz.tool.MarzConstant;
 import com.moemao.tgks.mar.marz.tool.MarzUtil;
@@ -297,11 +298,13 @@ public class MarzRequest
         return map;
     }
     
-    public Map<String, JSONObject> cardFusion(String sid, String baseId, String addId) throws Exception
+    public Map<String, JSONObject> cardFusion(String sid, String baseId, String add_uniqids, String add_cardids) throws Exception
     {
         map = new HashMap<String, JSONObject>();
+        String uniqidsStr = ",\"add_uniqids\":[" + add_uniqids + "]";
+        String cardidsStr = ",\"add_cardids\":[" + add_cardids + "]";
         
-        String paramStr = sid + "={\"base_uniqid\":" + baseId + ",\"add_uniqids\":[" + addId + "]}";
+        String paramStr = sid + "={\"base_uniqid\":" + baseId + (CommonUtil.isEmpty(add_uniqids) ? "" : uniqidsStr) + (CommonUtil.isEmpty(add_cardids) ? "" : cardidsStr) + "}";
         
         String[] result = httpRequest.sendPost(MarConstant.URL_CARDFUSION, paramStr).split(MarConstant.KRSMA_SPLIT);
         System.out.println(MarzConstant.LOG_SYSTEM_INFO + "cardFusion " + Thread.currentThread().getName());
