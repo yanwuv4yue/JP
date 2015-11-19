@@ -8,7 +8,7 @@ public static final String pre = "\\chr20_";
     
     public static void main(String[] args)
     {
-        File file = new File("D:\\10127");
+        File file = new File("D:\\10128");
         new CardPicId().ChangeFileName(file);
         System.out.println("all complete");
     }
