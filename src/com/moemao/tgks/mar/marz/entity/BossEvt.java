@@ -39,7 +39,7 @@ public class BossEvt extends MarzMapEvt
         this.setPictid(json.getString("pictid"));
         this.setState(json.getString("state"));
         this.setHint(json.getString("hint"));
-        this.setReward_cardids(json.getString("reward_cardids"));
+        //this.setReward_cardids(json.getString("reward_cardids")); // 20151216 这个字段报错
         this.setIs_model(json.getString("is_model"));
         //this.setUser_buff_id(json.getString("user_buff_id")); // 只有key副本有这个字段
         this.setUnlock_expire_time(json.getString("unlock_expire_time"));

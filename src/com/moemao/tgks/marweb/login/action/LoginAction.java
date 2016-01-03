@@ -75,7 +75,15 @@ public class LoginAction extends TGKSAction
         
         if (null != userList && userList.size() > 0)
         {
-            userEvt = userList.get(0);
+            for (UserEvt user : userList)
+            {
+                // 防止前缀相同的账号无法精准登录
+                if (userReq.getUsername().equals(user.getUsername()))
+                {
+                    userEvt = user;
+                    break;
+                }
+            }
             
             Map<String, Object> session = ActionContext.getContext().getSession();
             session.put(CommonConstant.USER_INFO, userEvt);

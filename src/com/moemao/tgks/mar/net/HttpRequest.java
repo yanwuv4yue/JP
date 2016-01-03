@@ -12,6 +12,12 @@ import java.util.concurrent.Semaphore;
 
 import net.sf.json.JSONObject;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.moemao.tgks.common.tool.CommonConstant;
+import com.moemao.tgks.common.tool.CommonUtil;
+
 public class HttpRequest
 {
     private static int SLEEP_TIME = 4000;
@@ -20,6 +26,18 @@ public class HttpRequest
     
     private boolean bDebug = false;
     
+    private static Log logger = LogFactory.getLog(HttpRequest.class);
+    
+    public static Log getLogger()
+    {
+        return logger;
+    }
+
+    public static void setLogger(Log logger)
+    {
+        HttpRequest.logger = logger;
+    }
+
     /**
      * 向指定URL发送GET方法的请求
      * 
@@ -151,6 +169,8 @@ public class HttpRequest
         {
             System.out.println("发送 POST 请求出现异常！" + e);
             e.printStackTrace();
+            CommonUtil.infoLog(logger, CommonConstant.SYSTEM_INFO_LOG_METHOD_OUT, "url:" + url);
+            CommonUtil.infoLog(logger, CommonConstant.SYSTEM_INFO_LOG_METHOD_OUT, "param:" + param);
             this.notify();
             throw e;
         }
