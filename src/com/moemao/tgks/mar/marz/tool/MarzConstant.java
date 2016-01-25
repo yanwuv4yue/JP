@@ -263,6 +263,11 @@ public class MarzConstant
     public static final int MARZMAP_PROCESS_1 = 1;
     
     /**
+     * MARZ PVP PROCESS 2 两回合
+     */
+    public static final int MARZMAP_PROCESS_2 = 2;
+    
+    /**
      * MARZ PVP PROCESS 3 三回合
      */
     public static final int MARZMAP_PROCESS_3 = 3;

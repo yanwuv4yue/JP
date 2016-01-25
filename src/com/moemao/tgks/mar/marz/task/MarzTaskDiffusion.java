@@ -1292,6 +1292,12 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     
                     if (groupJSON.containsKey("bosses") && !CommonUtil.isEmpty(groupJSON.getString("bosses")))
                     {
+                        // 副本组信息
+                        String appear_end = groupJSON.getString("appear_end");
+                        // 0 普通本；2 材料本；9 单BOSS本；10 SOLO本
+                        String stage_type = groupJSON.getString("stage_type");
+                        
+                        // 该组下所有地图信息
                         bossArray = groupJSON.getJSONArray("bosses");
                         
                         // 开始处理副本分组内每个难度的BOSSID
@@ -1301,6 +1307,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             
                             bossEvt = new BossEvt(bossJSON);
                             bossEvt.setBossName((groupJSON.getString("name").contains("グループ") ? "[鍵]" : groupJSON.getString("name")) +  bossJSON.getString("difficulty"));
+                            bossEvt.setAppear_end(appear_end);
+                            bossEvt.setStage_type(stage_type);
                             
                             // 狗粮本跟每日限定要塞成0
                             if (bossEvt.getBossId().startsWith(MarConstant.BOSSID_HEAD_PROCESS3_CHIARI)
@@ -1310,6 +1318,24 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             {
                                 bossEvt.setProcess(MarzConstant.MARZMAP_PROCESS_3);
                                 bossEvt.setTarget(0);
+                            }
+                            else if ("10".equals(stage_type))
+                            {
+                                if (bossEvt.getHint().contains("３連戦"))
+                                {
+                                    bossEvt.setProcess(MarzConstant.MARZMAP_PROCESS_3);
+                                    bossEvt.setTarget(4);
+                                }
+                                else if (bossEvt.getHint().contains("２連戦"))
+                                {
+                                    bossEvt.setProcess(MarzConstant.MARZMAP_PROCESS_2);
+                                    bossEvt.setTarget(4);
+                                }
+                                else
+                                {
+                                    bossEvt.setProcess(MarzConstant.MARZMAP_PROCESS_1);
+                                    bossEvt.setTarget(4);
+                                }
                             }
                             else
                             {
@@ -1345,6 +1371,11 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             else if (bossEvt.getBossId().startsWith(MarConstant.BOSSID_HEAD_PROCESS3_CHIARI))
                             {
                                 bossEvt.setSort("99");
+                                bossEvt.setVip(MarzConstant.MARZ_ACCOUNT_VIP_1);
+                            }
+                            else if ("超弩級".equals(bossEvt.getDifficulty()))
+                            {
+                                bossEvt.setSort("98");
                                 bossEvt.setVip(MarzConstant.MARZ_ACCOUNT_VIP_1);
                             }
                             else
@@ -1425,8 +1456,11 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         if ((MarzConstant.MARZMAP_STATE_0.equals(map.getState()) || MarzConstant.MARZMAP_STATE_1.equals(map.getState()))
                                 && account.getBpMax() >= map.getBpCost())
                         {
-                            bossEvt = map;
-                            break;
+                            if (!"-1".equals(map.getAppear_end()))
+                            {
+                                bossEvt = map;
+                                break;
+                            }
                         }
                     }
                 }
@@ -1447,6 +1481,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             if (id.contains(m.getBossId()) && account.getBpMax() >= m.getBpCost())
                             {
                                 bossEvt = m;
+                                /*
                                 MarzMapEvt map = MarzDataPool.getInstance().getMarzMapByBossId(m.getBossId());
                                 if (null != map)
                                 {
@@ -1454,6 +1489,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                     bossEvt.setTarget(map.getTarget());
                                     //mapEvt.setEnemy(mapList.get(0).getEnemy());
                                 }
+                                */
                                 break;
                             }
                         }
@@ -1565,7 +1601,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         }
                         
                         // add by ken 20150810 for solo map
-                        if (bossEvt.getBossId().startsWith(MarConstant.BOSSID_HEAD_PROCESS1_SOLO_KEY))
+                        if (MarConstant.STAGE_TYPE_10.equals(bossEvt.getStage_type()))
                         {
                             arthur1 = account.getUserId();
                             arthur2 = account.getUserId();
@@ -1588,6 +1624,10 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             {
                                 arthurType = "4";
                             }
+                            else
+                            {
+                                arthurType = "1";
+                            }
                         }
                         
                     	map = request.teamBattleSoloStart(sid, bossEvt.getBossId(), arthurType, arthur1, arthur2, arthur3, arthur4);
@@ -1602,16 +1642,22 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             account.setBp(account.getBp() - bossEvt.getBpCost());
                             
                             String battleEndParam = "";
-                            if (0 == bossEvt.getTarget() && MarzConstant.MARZMAP_PROCESS_3 == bossEvt.getProcess())
+                            
+                            // update by ken 2016-1-25 for 当前改为只通过process判断结果参数
+                            //if (0 == bossEvt.getTarget() && MarzConstant.MARZMAP_PROCESS_3 == bossEvt.getProcess())
+                            if (MarzConstant.MARZMAP_PROCESS_3 == bossEvt.getProcess())
                             {
                                 battleEndParam = MarConstant.BATTLESOLOEND_3;
                             }
-                            else if (1 == bossEvt.getTarget() && MarzConstant.MARZMAP_PROCESS_1 == bossEvt.getProcess())
+                            //else if (1 == bossEvt.getTarget() && MarzConstant.MARZMAP_PROCESS_1 == bossEvt.getProcess())
+                            else if (MarzConstant.MARZMAP_PROCESS_2 == bossEvt.getProcess())
                             {
-                                battleEndParam = MarConstant.BATTLESOLOEND_1_1;
+                                battleEndParam = MarConstant.BATTLESOLOEND_2;
                             }
                             else
                             {
+                                battleEndParam = MarConstant.BATTLESOLOEND_1;
+                                /* 2016-1-25 取消等级制度
                                 if (MarzConstant.MARZ_ACCOUNT_VIP_0.equals(account.getVip()))
                                 {
                                     battleEndParam = MarConstant.BATTLESOLOEND_1_2;
@@ -1628,6 +1674,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                 {
                                     battleEndParam = MarConstant.BATTLESOLOEND_1_5;
                                 }
+                                */
                             }
                             
                             Thread.sleep(MarzConstant.SLEEPTIME_BATTLE_SOLO);
@@ -1692,7 +1739,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         catch (Exception e)
         {
             CommonUtil.infoLog(logger, CommonConstant.SYSTEM_INFO_LOG_METHOD_OUT, String.format(account.getTgksId() + "战斗过程中发生异常！"));
-            System.out.println(e);
+            System.out.println(e.getMessage());
             return MarzConstant.FAILED;
         }
         

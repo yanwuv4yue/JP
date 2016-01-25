@@ -22,6 +22,9 @@ public class BossEvt extends MarzMapEvt
     private String unlock_expire_time;
     private String enemy_partyid;
     
+    private String appear_end;
+    private String stage_type;
+    
     public BossEvt()
     {
         
@@ -141,5 +144,25 @@ public class BossEvt extends MarzMapEvt
     public void setEnemy_partyid(String enemy_partyid)
     {
         this.enemy_partyid = enemy_partyid;
+    }
+
+    public String getAppear_end()
+    {
+        return appear_end;
+    }
+
+    public void setAppear_end(String appear_end)
+    {
+        this.appear_end = appear_end;
+    }
+
+    public String getStage_type()
+    {
+        return stage_type;
+    }
+
+    public void setStage_type(String stage_type)
+    {
+        this.stage_type = stage_type;
     }
 }
