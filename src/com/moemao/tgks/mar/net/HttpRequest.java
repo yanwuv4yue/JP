@@ -3,7 +3,9 @@ package com.moemao.tgks.mar.net;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
@@ -137,7 +139,7 @@ public class HttpRequest
             
             URL realUrl = new URL(url);
             // 打开和URL之间的连接
-            URLConnection conn = realUrl.openConnection();
+            HttpURLConnection conn = (HttpURLConnection) realUrl.openConnection();
             // 设置通用的请求属性
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
@@ -149,7 +151,7 @@ public class HttpRequest
             conn.setDoOutput(true);
             conn.setDoInput(true);
             // 获取URLConnection对象对应的输出流
-            out = new PrintWriter(conn.getOutputStream());
+            out = new PrintWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
             // 发送请求参数
             out.print(param);
             // flush输出流的缓冲
@@ -230,19 +232,7 @@ public class HttpRequest
     
     public static void main(String[] args) throws Exception
     {
-        HttpRequest request = new HttpRequest();
-        String result = "";
-        result = request.sendPost("https://game.fate-go.jp/account/regist", "appVer=1.0.3&lastAccessTime=1439485819&dataVer=20");
-        System.out.println(result);
-        JSONObject resCode= JSONObject.fromObject(result);
-        String userId = JSONObject.fromObject(resCode.getJSONArray("response").get(0)).getJSONObject("success").getString("userId");
-        String authKey = JSONObject.fromObject(resCode.getJSONArray("response").get(0)).getJSONObject("success").getString("authKey");
-        String secretKey = JSONObject.fromObject(resCode.getJSONArray("response").get(0)).getJSONObject("success").getString("secretKey");
-        System.out.println(userId + "|" + trans(authKey));
-        result = request.sendPost("http://game.fate-go.jp/gamedata/top?_userId="+userId, "userId="+userId+"&authKey="+trans(authKey)+"&appVer=1.0.3&lastAccessTime=1439485822&dataVer=20");
-        System.out.println(result);
-        result = request.sendPost("https://game.fate-go.jp/login/top?_userId="+userId, "userId="+userId+"&authKey="+trans(authKey)+"&appVer=1.0.3&lastAccessTime=1439485863&dataVer=20");
-        System.out.println(result);
+        
     }
     
     public static String trans(String str)
