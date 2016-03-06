@@ -1096,7 +1096,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 		}
                 		
                 		// 满足合成条件
-                		if (null != baseFameCard && fameFusionIdList.size() > 0)
+                		// update by ken 20160307 for baseCardId会在合成列表中
+                		if (null != baseFameCard && fameFusionIdList.size() > 0 && !fameFusionIdList.contains(baseFameCard.getUniqid()))
                 		{
                 			// 调用合成接口
                 			map = request.cardFusion(sid, baseFameCard.getUniqid(), MarzUtil.listToString(fameFusionIdList), "");
@@ -1373,7 +1374,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                 bossEvt.setSort("99");
                                 bossEvt.setVip(MarzConstant.MARZ_ACCOUNT_VIP_1);
                             }
-                            else if ("超弩級".equals(bossEvt.getDifficulty()))
+                            else if (bossEvt.getDifficulty().contains("超弩級"))
                             {
                                 bossEvt.setSort("98");
                                 bossEvt.setVip(MarzConstant.MARZ_ACCOUNT_VIP_1);
