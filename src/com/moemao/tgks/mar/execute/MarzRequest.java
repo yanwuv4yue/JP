@@ -402,11 +402,11 @@ public class MarzRequest
         return map;
     }
     
-    public Map<String, JSONObject> teamBattleSoloShow(String sid) throws Exception
+    public Map<String, JSONObject> teamBattleSoloShow(String sid, String arthurType) throws Exception
     {
         map = new HashMap<String, JSONObject>();
         
-        String paramStr = sid + "=";
+        String paramStr = sid + "={\"active_arthur_type\":" + arthurType + "}";
         String[] result = httpRequest.sendPost(MarConstant.URL_TEAMBATTLESOLOSHOW, paramStr).split(MarConstant.KRSMA_SPLIT);
         System.out.println(MarzConstant.LOG_SYSTEM_INFO + "teamBattleSoloShow " + Thread.currentThread().getName());
         

@@ -45,6 +45,7 @@ import com.moemao.tgks.mar.marzsetting.entity.MarzSettingEvt;
 import com.moemao.tgks.mar.marzsetting.entity.MarzSettingReq;
 import com.moemao.tgks.mar.marzsetting.service.MarzSettingService;
 import com.moemao.tgks.mar.tool.MarConstant;
+import com.moemao.tgks.moecode.tool.Util;
 
 public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
 {
@@ -1207,8 +1208,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         try
         {
             // 先查询单人战斗信息
-            map = request.teamBattleSoloShow(sid);
-            
+
+            map = request.teamBattleSoloShow(sid, this.arthurType);
             resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
             
             //this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_1, "战斗信息查询" + MarzUtil.resultCodeStr(resultCode));
@@ -1643,6 +1644,15 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             account.setBp(account.getBp() - bossEvt.getBpCost());
                             
                             String battleEndParam = "";
+                            
+                            // update by ken 2016-4-26 for 手动更新process防止某些副本卡死无法完成
+                            // 从数据库中查询出该副本，回写process值
+                            MarzMapEvt mapEvt = MarzDataPool.getInstance().getMarzMapByBossId(bossEvt.getBossId());
+                            
+                            if (Util.isNotEmpty(mapEvt) && Util.isNotEmpty(mapEvt.getProcess()))
+                            {
+                                bossEvt.setProcess(mapEvt.getProcess());
+                            }
                             
                             // update by ken 2016-1-25 for 当前改为只通过process判断结果参数
                             //if (0 == bossEvt.getTarget() && MarzConstant.MARZMAP_PROCESS_3 == bossEvt.getProcess())
