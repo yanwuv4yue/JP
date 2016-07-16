@@ -32,6 +32,22 @@
                         <option value="9">充值</option>
                     </select>
                 </td>
+			</tr>
+			<tr>
+				<td>
+					<label>日志内容: </label>
+				</td>
+				<td>
+					<input type="text" name="marzLogReq.info" />
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
+				<td>
+				</td>
 				<td>
 				</td>
 				<td>

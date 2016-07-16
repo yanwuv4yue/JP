@@ -19,7 +19,7 @@
                 AND t.TYPE = #{type}
             </if>
             <if test="info !=null and info !='' ">
-                AND t.INFO = #{info}
+                AND t.INFO LIKE CONCAT(CONCAT('%', #{info}),'%')
             </if>
             <if test="createTimeStart !=null and createTimeStart !='' ">
                 AND t.CREATETIME >= #{createTimeStart}

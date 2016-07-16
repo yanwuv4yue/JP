@@ -46,7 +46,7 @@ public class BossEvt extends MarzMapEvt
         this.setIs_model(json.getString("is_model"));
         //this.setUser_buff_id(json.getString("user_buff_id")); // 只有key副本有这个字段
         this.setUnlock_expire_time(json.getString("unlock_expire_time"));
-        this.setEnemy_partyid(json.getString("enemy_partyid"));
+        //this.setEnemy_partyid(json.getString("enemy_partyid")); // 4.3.0某些副本无此字段
     }
     
     public String getIs_only_my_deck()

@@ -307,7 +307,7 @@ public class MarzRequest
         String paramStr = sid + "={\"base_uniqid\":" + baseId + (CommonUtil.isEmpty(add_uniqids) ? "" : uniqidsStr) + (CommonUtil.isEmpty(add_cardids) ? "" : cardidsStr) + "}";
         
         String[] result = httpRequest.sendPost(MarConstant.URL_CARDFUSION, paramStr).split(MarConstant.KRSMA_SPLIT);
-        System.out.println(MarzConstant.LOG_SYSTEM_INFO + "cardFusion " + Thread.currentThread().getName());
+        System.out.println(MarzConstant.LOG_SYSTEM_INFO + "cardFusion2 " + Thread.currentThread().getName());
         
         JSONObject resCode= JSONObject.fromObject(result[1].substring(0, result[1].indexOf("}{") + 1));
         JSONObject cardFusion = JSONObject.fromObject(result[1].substring(result[1].indexOf("}{") + 1, result[1].length()));

@@ -34,6 +34,9 @@ import net.sf.json.JSONObject;
         create_time      17  16
         fame                18  17
         loyalty                    18
+        
+    chiari       1
+    decks       2
  */
 public class CardEvt
 {

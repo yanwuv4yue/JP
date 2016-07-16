@@ -202,7 +202,7 @@ public class MarConstant
     /**
      * 卡片合成
      */
-    public static final String URL_CARDFUSION = URL_PRE + "/Game/CardFusion";
+    public static final String URL_CARDFUSION = URL_PRE + "/Game/CardFusion2";
 
     /**
      * 卡组配置
