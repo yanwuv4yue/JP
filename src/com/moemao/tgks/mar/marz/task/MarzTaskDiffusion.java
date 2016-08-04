@@ -1588,6 +1588,24 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         }
                     }
                     
+                    // update by ken 20160805 如果为钥匙本，则需要先自动使用钥匙开一次门
+                    try
+                    {
+                        // 这里开门的动作报错也不做任何处理
+                        // 如果开门失败则后面会自动退出
+                        map = request.userBuffExec(sid, bossEvt.getUser_buff_id());
+                        
+                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                        {
+                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_1, "使用钥匙开启副本！");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // 不做任何处理
+                    }
+                    
                 	// update by ken 20150621 战斗改为一次性循环打完所有BP
                     do
                     {

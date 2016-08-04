@@ -488,6 +488,24 @@ public class MarzRequest
         return map;
     }
     
+    public Map<String, JSONObject> userBuffExec(String sid, String buffId) throws Exception
+    {
+        map = new HashMap<String, JSONObject>();
+        
+        String paramStr = sid + "={\"user_buff_id\":" + buffId + "}";
+        
+        String[] result = httpRequest.sendPost(MarConstant.URL_USERBUFFEXEC, paramStr).split(MarConstant.KRSMA_SPLIT);
+        System.out.println(MarzConstant.LOG_SYSTEM_INFO + "userBuffExec " + Thread.currentThread().getName());
+        
+        JSONObject resCode= JSONObject.fromObject(result[1].substring(0, result[1].indexOf("}{") + 1));
+        
+        map.put(MarzConstant.JSON_TAG_SID, this.sidJSONObject(result[0]));
+        map.put(MarzConstant.JSON_TAG_RESCODE, resCode);
+
+        result = null;
+        return map;
+    }
+    
     public Map<String, JSONObject> pvpShow(String sid) throws Exception
     {
         map = new HashMap<String, JSONObject>();

@@ -26,7 +26,7 @@
 				<label style="color:red;">${message }</label>
 			</div>
 			<div>
-				<input type="button" id="marweb_login" value="登陆" onclick="login();"/>
+				<input type="submit"  id="marweb_login" value="登陆" onclick="return login();"/>
 				<a href="#">忘记密码?</a>
 				<a href="register.jsp">注册账号</a>
 			</div>

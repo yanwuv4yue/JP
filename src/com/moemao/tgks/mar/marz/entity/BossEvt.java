@@ -18,6 +18,9 @@ public class BossEvt extends MarzMapEvt
     private String hint;
     private String reward_cardids;
     private String is_model;
+    /**
+     * 钥匙本ID
+     */
     private String user_buff_id;
     private String unlock_expire_time;
     private String enemy_partyid;
@@ -44,9 +47,19 @@ public class BossEvt extends MarzMapEvt
         this.setHint(json.getString("hint"));
         //this.setReward_cardids(json.getString("reward_cardids")); // 20151216 这个字段报错
         this.setIs_model(json.getString("is_model"));
-        //this.setUser_buff_id(json.getString("user_buff_id")); // 只有key副本有这个字段
+        if (json.containsKey("user_buff_id"))
+        {
+            // 只有key副本有这个字段 该字段用来开钥匙副本使用
+            String buffId = json.getString("user_buff_id");
+            String[] buffIds = buffId.substring(1, buffId.length() - 1).split(",");
+            this.setUser_buff_id(buffIds[buffIds.length - 1]);
+        }
         this.setUnlock_expire_time(json.getString("unlock_expire_time"));
-        //this.setEnemy_partyid(json.getString("enemy_partyid")); // 4.3.0某些副本无此字段
+        if (json.containsKey("enemy_partyid"))
+        {
+            // 4.3.0某些副本无此字段
+            this.setEnemy_partyid(json.getString("enemy_partyid"));
+        }
     }
     
     public String getIs_only_my_deck()

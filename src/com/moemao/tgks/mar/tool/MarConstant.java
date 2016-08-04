@@ -230,6 +230,11 @@ public class MarConstant
     public static final String URL_TEAMBATTLESOLOEND = URL_PRE + "/Game/TeamBattleSoloEnd";
     
     /**
+     * 钥匙副本 开门
+     */
+    public static final String URL_USERBUFFEXEC = URL_PRE + "/Game/UserBuffExec";
+    
+    /**
      * 探索 开始
      */
     public static final String URL_EXPLORESTART = URL_PRE + "/Game/ExploreStart";
