@@ -21,7 +21,7 @@ public class BossEvt extends MarzMapEvt
     /**
      * 钥匙本ID
      */
-    private String user_buff_id;
+    private String[] user_buff_id;
     private String unlock_expire_time;
     private String enemy_partyid;
     
@@ -52,7 +52,7 @@ public class BossEvt extends MarzMapEvt
             // 只有key副本有这个字段 该字段用来开钥匙副本使用
             String buffId = json.getString("user_buff_id");
             String[] buffIds = buffId.substring(1, buffId.length() - 1).split(",");
-            this.setUser_buff_id(buffIds[buffIds.length - 1]);
+            this.setUser_buff_id(buffIds);
         }
         this.setUnlock_expire_time(json.getString("unlock_expire_time"));
         if (json.containsKey("enemy_partyid"))
@@ -134,11 +134,11 @@ public class BossEvt extends MarzMapEvt
     {
         this.is_model = is_model;
     }
-    public String getUser_buff_id()
+    public String[] getUser_buff_id()
     {
         return user_buff_id;
     }
-    public void setUser_buff_id(String user_buff_id)
+    public void setUser_buff_id(String[] user_buff_id)
     {
         this.user_buff_id = user_buff_id;
     }

@@ -1380,9 +1380,14 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                 bossEvt.setSort("98");
                                 bossEvt.setVip(MarzConstant.MARZ_ACCOUNT_VIP_1);
                             }
-                            else
+                            else if (!Util.isEmpty(bossEvt.getUser_buff_id()))
                             {
                                 bossEvt.setSort("9");
+                                bossEvt.setVip(MarzConstant.MARZ_ACCOUNT_VIP_1);
+                            }
+                            else
+                            {
+                                bossEvt.setSort("80");
                                 bossEvt.setVip(MarzConstant.MARZ_ACCOUNT_VIP_1);
                             }
                             
@@ -1588,22 +1593,29 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         }
                     }
                     
-                    // update by ken 20160805 如果为钥匙本，则需要先自动使用钥匙开一次门
-                    try
+                    // update by ken 20160805 如果为钥匙本，则需要先自动使用钥匙开一次门  如果不够打两次，还是不开门吧
+                    if (Util.isNotEmpty(bossEvt.getUser_buff_id()) && account.getBp() > (bossEvt.getBpCost() * 2))
                     {
-                        // 这里开门的动作报错也不做任何处理
-                        // 如果开门失败则后面会自动退出
-                        map = request.userBuffExec(sid, bossEvt.getUser_buff_id());
-                        
-                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                        try
                         {
-                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_1, "使用钥匙开启副本！");
+                            // 这里开门的动作报错也不做任何处理
+                            // 如果开门失败则后面会自动退出
+                            for (String ubId : bossEvt.getUser_buff_id())
+                            {
+                                map = request.userBuffExec(sid, ubId);
+                                
+                                if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
+                                {
+                                    sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+                                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_1, "使用钥匙开启副本！");
+                                    break;
+                                }
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        // 不做任何处理
+                        catch (Exception e)
+                        {
+                            // 不做任何处理
+                        }
                     }
                     
                 	// update by ken 20150621 战斗改为一次性循环打完所有BP
