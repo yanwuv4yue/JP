@@ -1720,7 +1720,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             
                             Thread.sleep(MarzConstant.SLEEPTIME_BATTLE_SOLO);
                             
-                            map = request.teamBattleSoloEnd(sid, battleEndParam);
+                            // 4.4.0版本开始添加bossId字段
+                            map = request.teamBattleSoloEnd(sid, battleEndParam + bossEvt.getBossId() + "}");
                             
                             resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                             List<String> newCardIdList = new ArrayList<String>();
