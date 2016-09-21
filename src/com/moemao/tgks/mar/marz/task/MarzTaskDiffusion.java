@@ -86,6 +86,13 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     
     private boolean itemUseFlag = false;
     
+    private String itemUseId = "";
+    
+    /**
+     * PVP打完时的标志
+     */
+    private boolean pvpChallengeOverFlag = false;
+    
     private String arthurType = "3";
     
     public MarzTaskDiffusion(MarzAccountEvt marzAccountEvt)
@@ -666,13 +673,20 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         if (marzSettingEvt.getAutoUseBPPotionItemId().contains(item.getItemId()))
                         {
                             bpNum = item.getNum();
+                            
+                            if (bpNum == 0)
+                            {
+                                continue;
+                            }
+                            
+                            this.itemUseId = item.getItemId();
                             break;
                         }
                     }
                     
                     if (bpNum > 0)
                     {
-                        itemUseFlag = true;
+                        this.itemUseFlag = true;
                     }
                     // 如果药水已经用完 看是否开启了自动买药
                     else if (0 == bpNum)
@@ -692,7 +706,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                 {
                                     this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_3, "药水够买成功！");
                                     sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                                    itemUseFlag = true;
+                                    this.itemUseFlag = true;
                                 }
                                 else
                                 {
@@ -1057,6 +1071,13 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                                         baseFameCard = card;
                                     }
                                 }
+            				    else
+            				    {
+            				        if (card.getFame() < 100)
+                                    {
+                                        baseFameCard = card;
+                                    }
+            				    }
             				}
             			}
                 		
@@ -1075,6 +1096,13 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 			    else if (40 == card.getLv_max())
                                 {
                                     if (card.getFame() < 70)
+                                    {
+                                        baseFameCard = card;
+                                    }
+                                }
+                                else
+                                {
+                                    if (card.getFame() < 100)
                                     {
                                         baseFameCard = card;
                                     }
@@ -1577,7 +1605,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     if (itemUseFlag && account.getBp() < bossEvt.getBpCost())
                     {
                         // 有药水了可以直接嗑药
-                        map = request.itemUse(sid, marzSettingEvt.getAutoUseBPPotionItemId());
+                        map = request.itemUse(sid, this.itemUseId);
                         
                         resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                         
@@ -1790,11 +1818,19 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     
     private int pvp()
     {
+        // true表示PVP打完不需要再发请求
+        if (this.pvpChallengeOverFlag)
+        {
+            return MarzConstant.SUCCESS;
+        }
+        
         // add by ken 20150907 for pvp time limit
+        /*
         if (!MarzUtil.inPvpTime())
         {
             return MarzConstant.SUCCESS;
         }
+        */
         
         if (!validateSetting(MarzConstant.VALIDATE_SETTING_PVP))
         {
@@ -1822,144 +1858,38 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 
                 if (pvpShow.getInt("challenge") < 1)
                 {
+                    this.pvpChallengeOverFlag = true;
+                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_6, "本日PVP结算场次已经用完！停止相关PVP行动...");
                     // 次数小于1时直接返回
                     return MarzConstant.SUCCESS;
                 }
                 
-                // 调用missionShow 查看本日PVP任务该使用哪个职业
-                map = request.missionShow(sid);
+                // 这里选出PVP的主职业
+                String arthurPvpType = "1";
+                map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_1, arthurPvpType, deckMap);
                 resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                 
                 if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
                 {
                     sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
                     
-                    // 处理报文整理为mission的List
-                    JSONObject missionShow = map.get(MarzConstant.JSON_TAG_MISSIONSHOW);
-                    JSONArray missions = missionShow.getJSONArray("missions");
-                    List<MissionEvt> missionList = new ArrayList<MissionEvt>();
-                    JSONObject missionJSON;
+                    JSONObject pvpStart = map.get(MarzConstant.JSON_TAG_PVPSTART);
+                    // 这个是用来发送结束报文用的 很重要
+                    String btluid = pvpStart.getString("btluid");
+                    String enemy = pvpStart.getJSONObject("enemy_info").getString("name");
                     
-                    for (int i = 0, size = missions.size(); i < size; i++)
-                    {
-                        missionJSON = JSONObject.fromObject(missions.get(i));
-                        missionList.add(new MissionEvt(missionJSON));
-                    }
+                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_6, "斗技场PVP战斗开始，对手为：" + enemy);
                     
-                    for (MissionEvt m : missionList)
-                    {
-                        // 这里过滤任务只做收取任务奖励使用
-                        if ("1".equals(m.getState()))
-                        {
-                            map = this.request.missionReward(sid, m.getMissionid());
-                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "收取任务奖励：" + m.getTitle());
-                        }
-                    }
+                    Thread.sleep(MarzConstant.SLEEPTIME_BATTLE_SOLO);
                     
-                    // 这里选出PVP的主职业
-                    String arthurPvpType = "1";
-                    boolean freePVP = false;
-                    for (MissionEvt m : missionList)
-                    {
-                        if ("2003001".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            arthurPvpType = "1";
-                        }
-                        else if ("2003002".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            arthurPvpType = "2";
-                        }
-                        else if ("2003003".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            arthurPvpType = "3";
-                        }
-                        else if ("2003004".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            arthurPvpType = "4";
-                        }
-                        else if ("2004001".equals(m.getMissionid()) && "0".equals(m.getState()))
-                        {
-                            freePVP = true;
-                        }
-                    }
+                    map = this.request.pvpEnd(sid, btluid, pvpEndMap.get(arthurPvpType));
+                    resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                     
-                    // 防止PVP经常少一场
-                    /*
-                    if (freePVP)
+                    if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
                     {
-                        map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_0, arthurPvpType, deckMap);
-                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                        
-                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-                        {
-                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            
-                            JSONObject pvpStart = map.get(MarzConstant.JSON_TAG_PVPSTART);
-                            String btluid = pvpStart.getString("btluid");
-                            Thread.sleep(MarzConstant.SLEEPTIME_BATTLE_SOLO);
-                            map = this.request.pvpEnd(sid, btluid, pvpEndMap.get(arthurPvpType));
-                            resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                            
-                            if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-                            {
-                                sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            }
-                        }
-                    }
-                    */
-                    
-                    if (freePVP)
-                    {
-                        map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_0, arthurPvpType, deckMap);
-                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
+                        this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_6, "斗技场PVP战斗结束，战斗结果：胜利");
                         
                         sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                        
-                        JSONObject pvpStart = map.get(MarzConstant.JSON_TAG_PVPSTART);
-                        // 这个是用来发送结束报文用的 很重要
-                        String btluid = pvpStart.getString("btluid");
-                        String enemy = pvpStart.getJSONObject("enemy_info").getString("name");
-                        
-                        this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_6, "斗技场PVP战斗开始，对手为：" + enemy);
-                        
-                        Thread.sleep(MarzConstant.SLEEPTIME_BATTLE_SOLO);
-                        
-                        map = this.request.pvpEnd(sid, btluid, pvpEndMap.get(arthurPvpType));
-                        resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                        
-                        if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-                        {
-                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_6, "斗技场PVP战斗结束，战斗结果：胜利");
-                            
-                            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                            /*
-                            JSONObject pvpEnd = map.get(MarzConstant.JSON_TAG_RESCODE);
-                            
-                            if (JSONObject.fromObject(pvpEnd.getJSONArray("notification").get(0)).getInt("mission_clear_receive") > 0)
-                            {
-                                // 如果可回收的任务奖励大于0时 再次调用任务请求
-                                map = request.missionShow(sid);
-                                resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
-                                
-                                if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-                                {
-                                    sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                                    
-                                    // 处理报文整理为mission的List
-                                    missionShow = map.get(MarzConstant.JSON_TAG_MISSIONSHOW);
-                                    missions = missionShow.getJSONArray("missions");
-                                    missionList = new ArrayList<MissionEvt>();
-                                    
-                                    for (int i = 0, size = missions.size(); i < size; i++)
-                                    {
-                                        missionJSON = JSONObject.fromObject(missions.get(i));
-                                        missionList.add(new MissionEvt(missionJSON));
-                                    }
-                                }
-                            }
-                            */
-                        }
                     }
                 }
             }
