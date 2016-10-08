@@ -120,14 +120,19 @@ public class MarConstant
     public static final String URL_PRE = "http://app.kairisei-ma.jp";
     
     /**
+     * 身份认证
+     */
+    public static final String URL_AUTH_CHECK = URL_PRE_HTTPS + "/Auth2/auth_check.php";
+    
+    /**
      * 注册
      */
-    public static final String URL_REGIST = URL_PRE_HTTPS + "/Auth/login.php";
+    public static final String URL_REGIST = URL_PRE_HTTPS + "/Auth2/login.php";
 
     /**
      * 登录
      */
-    public static final String URL_LOGIN = URL_PRE_HTTPS + "/Auth/login.php";
+    public static final String URL_LOGIN = URL_PRE_HTTPS + "/Auth2/login.php";
 
     /**
      * 连接
@@ -218,6 +223,11 @@ public class MarConstant
      * 战斗信息 单人
      */
     public static final String URL_TEAMBATTLESOLOSHOW = URL_PRE + "/Game/TeamBattleSoloShow";
+
+    /**
+     * 战斗信息 单人选择其他职业信息
+     */
+    public static final String URL_TEAMBATTLESOLOPARTNERSHOW = URL_PRE + "/Game/TeamBattleSoloPartnerShow";
 
     /**
      * 战斗开始 单人

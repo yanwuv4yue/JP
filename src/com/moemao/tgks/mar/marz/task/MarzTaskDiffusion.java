@@ -302,7 +302,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         }
         catch (Exception e)
         {
-            
+            System.out.println(MarConstant.MODULE_TAG + account.getTgksId() + "任务发生异常，即将退出...");
         }
         
         this.offLine();
@@ -462,18 +462,22 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         {
             if (MarzConstant.MARZ_ACCOUNT_TYPE_0.equals(account.getType()))
             {
+            	request.authCheckIOS(account.getUuid());
                 map = request.loginIOS(account.getUuid(), account.getHashToken());
             }
             else if (MarzConstant.MARZ_ACCOUNT_TYPE_1.equals(account.getType()))
             {
+            	request.authCheckAndroid(account.getUuid());
                 map = request.loginAndroid(account.getUuid(), account.getHashToken());
             }
             else if (MarzConstant.MARZ_ACCOUNT_TYPE_2.equals(account.getType()))
             {
+            	request.authCheckAndroid(account.getUuid());
                 map = request.loginAndroidSE(account.getUuid(), account.getHashToken());
             }
             else
             {
+            	request.authCheckIOS(account.getUuid());
                 map = request.loginIOS(account.getUuid(), account.getHashToken());
             }
             
@@ -481,14 +485,13 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             
             this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "账号登录" + MarzUtil.resultCodeStr(resultCode));
             
-            if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
-            {
-                sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
-                
-                map = request.connect(sid);
-                
-                account.setSessionId(sid);
-            }
+            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+            
+            map = request.connect(sid);
+            
+            sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
+            
+            account.setSessionId(sid);
         }
         catch (Exception e)
         {
@@ -1236,7 +1239,6 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         try
         {
             // 先查询单人战斗信息
-
             map = request.teamBattleSoloShow(sid, this.arthurType);
             resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
             
@@ -1265,31 +1267,6 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 
                 JSONArray battleMapNormal = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOSHOW).getJSONArray("normal_groups");                
                 JSONArray battleMapEvent = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOSHOW).getJSONArray("event_groups");
-                JSONArray arthurs = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOSHOW).getJSONArray("arthurs");
-                JSONObject arthur;
-                
-                // 处理4个NPC亚瑟的ID
-                for (int i = 0; i < arthurs.size(); i++)
-                {
-                    arthur = JSONObject.fromObject(arthurs.get(i));
-                    
-                    if (1 == arthur.getInt("arthur_type"))
-                    {
-                        arthur1 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
-                    }
-                    else if (2 == arthur.getInt("arthur_type"))
-                    {
-                        arthur2 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
-                    }
-                    else if (3 == arthur.getInt("arthur_type"))
-                    {
-                        arthur3 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
-                    }
-                    else if (4 == arthur.getInt("arthur_type"))
-                    {
-                        arthur4 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
-                    }
-                }
                 
                 // 整理当前可以战斗的BOSSID Normal
                 for (int i = 0; i < battleMapNormal.size(); i++)
@@ -1687,6 +1664,35 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             else
                             {
                                 arthurType = "1";
+                            }
+                        }
+                        
+                        // add by Ken 20161009 for v4.6.0 arthurs信息单独开了一个新的接口TeamBattleSoloPartnerShow
+                        map = request.teamBattleSoloPartnerShow(sid, bossEvt.getBossId());
+                        
+                        JSONArray arthurs = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOPARTNERSHOW).getJSONArray("arthurs");
+                        JSONObject arthur;
+                        
+                        // 处理4个NPC亚瑟的ID
+                        for (int i = 0; i < arthurs.size(); i++)
+                        {
+                            arthur = JSONObject.fromObject(arthurs.get(i));
+                            
+                            if (1 == arthur.getInt("arthur_type"))
+                            {
+                                arthur1 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                            }
+                            else if (2 == arthur.getInt("arthur_type"))
+                            {
+                                arthur2 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                            }
+                            else if (3 == arthur.getInt("arthur_type"))
+                            {
+                                arthur3 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                            }
+                            else if (4 == arthur.getInt("arthur_type"))
+                            {
+                                arthur4 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
                             }
                         }
                         

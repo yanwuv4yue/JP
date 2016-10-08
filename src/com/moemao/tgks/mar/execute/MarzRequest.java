@@ -41,11 +41,27 @@ public class MarzRequest
         return json;
     }
     
+    public void authCheckIOS(String uuid) throws Exception
+    {
+    	map = new HashMap<String, JSONObject>();
+    	String paramStr = "{\"market\":1,\"os\":0,\"uuid\":\"" + uuid + "\",\"clver\":\"" + MarzUtil.getMarzDBConfig(MarzConstant.DBCONFIG_LOGIN_CLVER_IOS) + "\",\"bsid\":\"\"}";
+    	httpRequest.sendPost(MarConstant.URL_AUTH_CHECK, paramStr);
+    	System.out.println(MarzConstant.LOG_SYSTEM_INFO + "authCheckIOS " + uuid + " " + Thread.currentThread().getName());
+    }
+    
+    public void authCheckAndroid(String uuid) throws Exception
+    {
+    	map = new HashMap<String, JSONObject>();
+    	String paramStr = "{\"market\":2,\"os\":1,\"uuid\":\"" + uuid + "\",\"clver\":\"" + MarzUtil.getMarzDBConfig(MarzConstant.DBCONFIG_LOGIN_CLVER_ANDROID) + "\",\"bsid\":\"\"}";
+    	httpRequest.sendPost(MarConstant.URL_AUTH_CHECK, paramStr);
+    	System.out.println(MarzConstant.LOG_SYSTEM_INFO + "authCheckAndroid " + uuid + " " + Thread.currentThread().getName());
+    }
+    
     public Map<String, JSONObject> loginIOS(String uuid, String hashToken) throws Exception
     {
         map = new HashMap<String, JSONObject>();
         
-        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + MarzUtil.GenerateHashToken(uuid) + "\",\"clver\":\"" + MarzUtil.getMarzDBConfig(MarzConstant.DBCONFIG_LOGIN_CLVER_IOS) + "\",\"os\":0,\"carrier\":3,\"market\":1,\"lang\":0,\"device\":\"iPhone5S\",\"token\":\"\",\"os_ver\":\"iPhone OS 7.1.2\"}";
+        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + MarzUtil.GenerateHashToken(uuid) + "\",\"clver\":\"" + MarzUtil.getMarzDBConfig(MarzConstant.DBCONFIG_LOGIN_CLVER_IOS) + "\",\"os\":0,\"carrier\":3,\"market\":1,\"lang\":0,\"device\":\"iPhone6Plus\",\"token\":\"\",\"os_ver\":\"iPhone OS 9.3.2\",\"bsid\":\"\"}";
         
         String result = httpRequest.sendPost(MarConstant.URL_LOGIN, paramStr);
         System.out.println(MarzConstant.LOG_SYSTEM_INFO + "loginIOS " + uuid + " " + Thread.currentThread().getName());
@@ -64,7 +80,7 @@ public class MarzRequest
     {
         map = new HashMap<String, JSONObject>();
         
-        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + MarzUtil.GenerateHashToken(uuid) + "\",\"clver\":\"" + MarzUtil.getMarzDBConfig(MarzConstant.DBCONFIG_LOGIN_CLVER_ANDROID) + "\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
+        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + MarzUtil.GenerateHashToken(uuid) + "\",\"clver\":\"" + MarzUtil.getMarzDBConfig(MarzConstant.DBCONFIG_LOGIN_CLVER_ANDROID) + "\",\"os\":1,\"carrier\":1,\"market\":2,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\",\"bsid\":\"\"}";
         
         String result = httpRequest.sendPost(MarConstant.URL_LOGIN, paramStr);
         System.out.println(MarzConstant.LOG_SYSTEM_INFO + "loginAndroid " + uuid + " " + Thread.currentThread().getName());
@@ -83,7 +99,7 @@ public class MarzRequest
     {
         map = new HashMap<String, JSONObject>();
         
-        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + MarzUtil.GenerateHashToken(uuid) + "\",\"clver\":\"" + MarzUtil.getMarzDBConfig(MarzConstant.DBCONFIG_LOGIN_CLVER_ANDROID) + "\",\"os\":1,\"carrier\":1,\"market\":3,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\"}";
+        String paramStr = "{\"uuid\":\"" + uuid + "\",\"hash_token\":\"" + MarzUtil.GenerateHashToken(uuid) + "\",\"clver\":\"" + MarzUtil.getMarzDBConfig(MarzConstant.DBCONFIG_LOGIN_CLVER_ANDROID) + "\",\"os\":1,\"carrier\":1,\"market\":3,\"lang\":0,\"device\":\"LGE Nexus 5\",\"token\":\"\",\"os_ver\":\"Android OS 4.4.3 / API-19 (FUCK YOU)\",\"bsid\":\"\"}";
         
         String result = httpRequest.sendPost(MarConstant.URL_LOGIN, paramStr);
         System.out.println(MarzConstant.LOG_SYSTEM_INFO + "loginAndroidSE " + uuid + " " + Thread.currentThread().getName());
@@ -419,6 +435,30 @@ public class MarzRequest
         map.put(MarzConstant.JSON_TAG_SID, this.sidJSONObject(result[0]));
         map.put(MarzConstant.JSON_TAG_RESCODE, resCode);
         map.put(MarzConstant.JSON_TAG_TEAMBATTLESOLOSHOW, teamBattleSoloShow);
+
+        result = null;
+        resCode = null;
+        return map;
+    }
+    
+    public Map<String, JSONObject> teamBattleSoloPartnerShow(String sid, String bossId) throws Exception
+    {
+        map = new HashMap<String, JSONObject>();
+        
+        String paramStr = sid + "={\"bossid\":" + bossId + "}";
+        
+        String[] result = httpRequest.sendPost(MarConstant.URL_TEAMBATTLESOLOPARTNERSHOW, paramStr).split(MarConstant.KRSMA_SPLIT);
+        System.out.println(MarzConstant.LOG_SYSTEM_INFO + "teamBattleSoloPartnerShow " + Thread.currentThread().getName());
+        
+        // 有好友信息 必须设置过滤
+        result = this.requestFilter(result);
+        
+        JSONObject resCode= JSONObject.fromObject(result[1].substring(0, result[1].indexOf("}{") + 1));
+        JSONObject teamBattleSoloPartnerShow = JSONObject.fromObject(result[1].substring(result[1].indexOf("}{") + 1, result[1].length()));
+        
+        map.put(MarzConstant.JSON_TAG_SID, this.sidJSONObject(result[0]));
+        map.put(MarzConstant.JSON_TAG_RESCODE, resCode);
+        map.put(MarzConstant.JSON_TAG_TEAMBATTLESOLOPARTNERSHOW, teamBattleSoloPartnerShow);
 
         result = null;
         resCode = null;

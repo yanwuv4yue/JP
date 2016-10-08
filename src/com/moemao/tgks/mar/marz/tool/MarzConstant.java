@@ -64,6 +64,7 @@ public class MarzConstant
     public static final String JSON_TAG_PRESENTBOXRECV= "presentBoxRecv";
     public static final String JSON_TAG_PRESENTBOXMULTIRECV = "presentBoxMultiRecv";
     public static final String JSON_TAG_TEAMBATTLESOLOSHOW = "teamBattleSoloShow";
+    public static final String JSON_TAG_TEAMBATTLESOLOPARTNERSHOW = "teamBattleSoloPartnerShow";
     public static final String JSON_TAG_TEAMBATTLESOLOSTART = "teamBattleSoloStart";
     public static final String JSON_TAG_TEAMBATTLESOLOEND = "teamBattleSoloEnd";
     public static final String JSON_TAG_PVPSHOW = "pvpShow";
