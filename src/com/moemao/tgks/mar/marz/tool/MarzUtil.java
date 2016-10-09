@@ -113,18 +113,18 @@ public class MarzUtil
     
     /**
      * 
-     * @Title: inPvpTime
-     * @Description: 时间 ①7:00～8:00　②13:00～14:00　③18:00～19:00　④22:00～23:00
+     * @Title: inPvpResetTime
+     * @Description: 时间 ①7:00～8:00　②14:00～15:00　③18:00～19:00　④23:00～24:00
      * @return
      * @return boolean 返回类型
      * @throws
      */
-    public static boolean inPvpTime()
+    public static boolean inPvpResetTime()
     {
         Date now = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("HH");
         int hour = Integer.parseInt(sdf.format(now));
-        return (hour == 7 || hour == 13 || hour == 18 || hour == 22);
+        return (hour == 7 || hour == 14 || hour == 18 || hour == 23);
     }
     
     public static String GenerateHashToken(String uuid) throws Exception

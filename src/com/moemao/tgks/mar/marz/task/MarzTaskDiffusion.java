@@ -542,7 +542,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             List<MarzItemEvt> marzItemList = this.marzItemService.queryMarzItem(marzItemReq);
             
             // add by ken 20150907 for presentRecv time limit
-            if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOPRESENTRECV) && MarzUtil.inPvpTime())
+            if (validateSetting(MarzConstant.VALIDATE_SETTING_AUTOPRESENTRECV) && MarzUtil.inPvpResetTime())
             {
                 // 先看看任务里面有没有可收取的
                 map = request.missionShow(sid);
