@@ -95,6 +95,11 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
     
     private String arthurType = "3";
     
+    /**
+     * 登录失败次数
+     */
+    private int loginFailedTimes = 0;
+    
     public MarzTaskDiffusion(MarzAccountEvt marzAccountEvt)
     {
         // 初始化一些参数
@@ -156,6 +161,15 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     
                     if (MarzConstant.RES_CODE_SUCCESS_0 != resultCode)
                     {
+                        if (this.loginFailedTimes > 3)
+                        {
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "登录失败已达最大次数，退出挂机...");
+                            this.offLine();
+                            break;
+                        }
+                        
+                        this.loginFailedTimes++;
+                        
                         if (MarzConstant.RES_CODE_ERROR_M5 == resultCode)
                         {
                             this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "系统维护中，账号自动下线，请留意游戏公告等开服后手动上线...");
@@ -203,6 +217,15 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     
                     if (MarzConstant.RES_CODE_SUCCESS_0 != resultCode)
                     {
+                        if (this.loginFailedTimes > 3)
+                        {
+                            this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "登录失败已达最大次数，退出挂机...");
+                            this.offLine();
+                            break;
+                        }
+                        
+                        this.loginFailedTimes++;
+                        
                         if (MarzConstant.RES_CODE_ERROR_M5 == resultCode)
                         {
                             this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_0, "系统维护中，账号自动下线，请留意游戏公告等开服后手动上线...");
@@ -514,6 +537,8 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
             
             if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
             {
+                this.loginFailedTimes = 0;
+                
                 sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
                 
                 account.setSessionId(sid);
@@ -527,6 +552,7 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
         }
         catch (Exception e)
         {
+            this.loginFailedTimes++;
             return MarzConstant.FAILED;
         }
         
@@ -1667,33 +1693,45 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                             }
                         }
                         
-                        // add by Ken 20161009 for v4.6.0 arthurs信息单独开了一个新的接口TeamBattleSoloPartnerShow
-                        map = request.teamBattleSoloPartnerShow(sid, bossEvt.getBossId());
-                        
-                        JSONArray arthurs = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOPARTNERSHOW).getJSONArray("arthurs");
-                        JSONObject arthur;
-                        
-                        // 处理4个NPC亚瑟的ID
-                        for (int i = 0; i < arthurs.size(); i++)
+                        // add by Ken 20161019 for v4.6.1 添加对is_only_my_deck的判断
+                        if ("0".equals(bossEvt.getIs_only_my_deck()))
                         {
-                            arthur = JSONObject.fromObject(arthurs.get(i));
+                            // add by Ken 20161009 for v4.6.0 arthurs信息单独开了一个新的接口TeamBattleSoloPartnerShow
+                            map = request.teamBattleSoloPartnerShow(sid, bossEvt.getBossId());
                             
-                            if (1 == arthur.getInt("arthur_type"))
+                            JSONArray arthurs = map.get(MarzConstant.JSON_TAG_TEAMBATTLESOLOPARTNERSHOW).getJSONArray("arthurs");
+                            JSONObject arthur;
+                            
+                            // 处理4个NPC亚瑟的ID
+                            for (int i = 0; i < arthurs.size(); i++)
                             {
-                                arthur1 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                                arthur = JSONObject.fromObject(arthurs.get(i));
+                                
+                                if (1 == arthur.getInt("arthur_type"))
+                                {
+                                    arthur1 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                                }
+                                else if (2 == arthur.getInt("arthur_type"))
+                                {
+                                    arthur2 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                                }
+                                else if (3 == arthur.getInt("arthur_type"))
+                                {
+                                    arthur3 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                                }
+                                else if (4 == arthur.getInt("arthur_type"))
+                                {
+                                    arthur4 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
+                                }
                             }
-                            else if (2 == arthur.getInt("arthur_type"))
-                            {
-                                arthur2 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
-                            }
-                            else if (3 == arthur.getInt("arthur_type"))
-                            {
-                                arthur3 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
-                            }
-                            else if (4 == arthur.getInt("arthur_type"))
-                            {
-                                arthur4 = JSONObject.fromObject(arthur.getJSONArray("partners").get(0)).getString("userid");
-                            }
+                        }
+                        else if ("1".equals(bossEvt.getIs_only_my_deck()))
+                        {
+                            // 该类型副本只能自己的卡组打
+                            arthur1 = account.getUserId();
+                            arthur2 = account.getUserId();
+                            arthur3 = account.getUserId();
+                            arthur4 = account.getUserId();
                         }
                         
                     	map = request.teamBattleSoloStart(sid, bossEvt.getBossId(), arthurType, arthur1, arthur2, arthur3, arthur4);
@@ -1871,8 +1909,9 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                 }
                 
                 // 这里选出PVP的主职业
+                // change by Ken 20161116 for v4.7.0
                 String arthurPvpType = "1";
-                map = this.request.pvpStart(sid, MarzConstant.MARZPVP_TYPE_1, arthurPvpType, deckMap);
+                map = this.request.pvpStart2(sid, MarzConstant.MARZPVP_TYPE_1, arthurPvpType, deckMap);
                 resultCode = map.get(MarzConstant.JSON_TAG_RESCODE).getInt(MarzConstant.JSON_TAG_RESCODE);
                 
                 if (MarzConstant.RES_CODE_SUCCESS_0 == resultCode)
@@ -1881,11 +1920,14 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                     
                     JSONObject pvpStart = map.get(MarzConstant.JSON_TAG_PVPSTART);
                     // 这个是用来发送结束报文用的 很重要
-                    String btluid = pvpStart.getString("btluid");
+                    //String btluid = pvpStart.getString("btluid");
                     String enemy = pvpStart.getJSONObject("enemy_info").getString("name");
+                    int bf_pvp_point = pvpStart.getInt("bf_pvp_point");
+                    int af_pvp_point = pvpStart.getInt("af_pvp_point");
+                    int challenge = pvpStart.getInt("challenge");
                     
-                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_6, "斗技场PVP战斗开始，对手为：" + enemy);
-                    
+                    this.marzLogService.marzLog(account, MarzConstant.MARZ_LOG_TYPE_6, "斗技场PVP战斗对手为：" + enemy + "战斗结果：" + (af_pvp_point > bf_pvp_point ? "胜利" : "失败") + "，本日剩余场次：" + challenge);
+                    /*
                     Thread.sleep(MarzConstant.SLEEPTIME_BATTLE_SOLO);
                     
                     map = this.request.pvpEnd(sid, btluid, pvpEndMap.get(arthurPvpType));
@@ -1897,7 +1939,9 @@ public class MarzTaskDiffusion implements Runnable, ApplicationContextAware
                         
                         sid = map.get(MarzConstant.JSON_TAG_SID).getString(MarzConstant.JSON_TAG_SID);
                     }
+                    */
                 }
+                
             }
         }
         catch (Exception e)

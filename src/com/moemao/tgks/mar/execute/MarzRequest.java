@@ -647,6 +647,58 @@ public class MarzRequest
     
     /**
      * 
+     * @Title: pvpStart
+     * @Description PVP战斗开始
+     * @param sid
+     * @param arthur_type 主选亚瑟类型 1 佣兵；2 富豪；3 盗贼；4 歌姬
+     * @param deckMap 卡组ID字符串的MAP 10个卡ID 逗号连接 Map Key为亚瑟类型的1,2,3,4
+     * @return
+     * @throws Exception
+     * @return Map<String,JSONObject> 返回类型
+     * @throws
+     */
+    public Map<String, JSONObject> pvpStart2(String sid, String pvpType, String arthur_type, Map<String, DeckEvt> deckMap) throws Exception
+    {
+        map = new HashMap<String, JSONObject>();
+        
+        List<String> typeList = new ArrayList<String>(Arrays.asList("1", "2", "3", "4"));
+        for (String type : typeList)
+        {
+            if (type.equals(arthur_type))
+            {
+                typeList.remove(type);
+                break;
+            }
+        }
+        
+        String startInfo = "{\"type\":" + pvpType + ",\"select_arthur_type\":" + arthur_type + ",\"pvp_my_deck\":["
+            + "{\"arthur_type\":" + arthur_type + ",\"job_type\":" + arthur_type + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":" + deckMap.get(arthur_type).getCard_uniqid() + ",\"support_card_uniqid\":" + deckMap.get(arthur_type).getSupport_card_uniqid() + ",\"sphr_uniqid\":" + deckMap.get(arthur_type).getSphr_uniqid() + "},"
+            + "{\"arthur_type\":" + typeList.get(0) + ",\"job_type\":" + typeList.get(0) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":" + deckMap.get(typeList.get(0)).getCard_uniqid() + ",\"support_card_uniqid\":" + deckMap.get(typeList.get(0)).getSupport_card_uniqid() + ",\"sphr_uniqid\":" + deckMap.get(typeList.get(0)).getSphr_uniqid() + "},"
+            + "{\"arthur_type\":" + typeList.get(1) + ",\"job_type\":" + typeList.get(1) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":" + deckMap.get(typeList.get(1)).getCard_uniqid() + ",\"support_card_uniqid\":" + deckMap.get(typeList.get(1)).getSupport_card_uniqid() + ",\"sphr_uniqid\":" + deckMap.get(typeList.get(1)).getSphr_uniqid() + "},"
+            + "{\"arthur_type\":" + typeList.get(2) + ",\"job_type\":" + typeList.get(2) + ",\"deck_idx\":0,\"leader_card_idx\":0,\"card_uniqid\":" + deckMap.get(typeList.get(2)).getCard_uniqid() + ",\"support_card_uniqid\":" + deckMap.get(typeList.get(2)).getSupport_card_uniqid() + ",\"sphr_uniqid\":" + deckMap.get(typeList.get(2)).getSphr_uniqid() + "}]}";
+        
+        String paramStr = sid + "=" + startInfo;
+        
+        String[] result = httpRequest.sendPost(MarConstant.URL_PVPSTART2, paramStr).split(MarConstant.KRSMA_SPLIT);
+        System.out.println(MarzConstant.LOG_SYSTEM_INFO + "pvpStart2 " + Thread.currentThread().getName());
+        
+        // 有名字 必须设置过滤
+        result = this.requestFilter(result);
+        
+        JSONObject resCode= JSONObject.fromObject(result[1].substring(0, result[1].indexOf("}{") + 1));
+        JSONObject pvpStart = JSONObject.fromObject(result[1].substring(result[1].indexOf("}{") + 1, result[1].length()));
+        
+        map.put(MarzConstant.JSON_TAG_SID, this.sidJSONObject(result[0]));
+        map.put(MarzConstant.JSON_TAG_RESCODE, resCode);
+        map.put(MarzConstant.JSON_TAG_PVPSTART, pvpStart);
+
+        result = null;
+        resCode = null;
+        return map;
+    }
+    
+    /**
+     * 
      * @Title: missionShow
      * @Description: state 0 未完成；1 完成为领取；2 完成已领取
      * @param sid

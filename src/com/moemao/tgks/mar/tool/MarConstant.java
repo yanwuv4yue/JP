@@ -265,6 +265,11 @@ public class MarConstant
     public static final String URL_PVPSTART = URL_PRE + "/Game/PvpStart";
     
     /**
+     * PVP开始2
+     */
+    public static final String URL_PVPSTART2 = URL_PRE + "/Game/PvpStart2";
+    
+    /**
      * PVP结束
      */
     public static final String URL_PVPEND = URL_PRE + "/Game/PvpEnd";
